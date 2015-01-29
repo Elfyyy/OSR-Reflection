@@ -3,7 +3,7 @@
 const
   IncludeRevision = 9;
   SubRev = 0;
-{$i Reflection/lib/internal/Includes.simba}
+{$i ReflectionDev/lib/internal/Includes.simba}
 
 procedure TReflectionInternals.SetupSmart;
 var

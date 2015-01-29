@@ -313,7 +313,6 @@ end;
 
 procedure TReflectLocalPlayer.GetInteractingNpc(var TheNpc: TReflectNpc);
 begin
-  TheNpc.Null;
   if Self.GetInteractingIndex = -1 then
     Exit;
   TheNpc.GetIndex(Self.GetInteractingIndex);
