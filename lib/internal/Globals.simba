@@ -83,7 +83,7 @@ end;
 {$IFNDEF CODEINSIGHT}
 type
   TObjectType = record
-  ObjType: Integer;
+  Index: Integer;
   Flags, Height, Render, Orientation, LocalX, LocalY, OffsetX, OffsetY,
     Plane, Id, RelativeX, RelativeY, SceneObject: THook;
 end;

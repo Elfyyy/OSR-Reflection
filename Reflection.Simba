@@ -206,6 +206,7 @@ begin
   Reflect.Internals.SetupSmart;
   Reflect.Internals.HooksValid;
   Reflect.Internals.SetupCurves;
+  Reflect.Internals.SetupObjects;
   Reflect.Logger.Status('Successfully setup!');
 end;
 
