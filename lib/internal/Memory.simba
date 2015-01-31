@@ -76,6 +76,8 @@ var
 begin
   for I := 0 to High(HookCache[Ord(Key)]) do
   begin
+    if HookCache[Ord(Key)][I] = 0 then
+      Continue;
     Reflect.Smart.FreeObject(HookCache[Ord(Key)][I]);
     if HookCache[Ord(Key)][I] = 0 then
     begin
@@ -91,13 +93,27 @@ begin
   end;
 end;
 
+function TReflectionMemory.IsNull(Key: TCacheKey): Boolean
+var
+  I, H: Integer;
+begin
+  Result := True;
+  H := High(HookCache[Key]);
+  for I := 0 to H do
+    if HookCache[Key][I] <> 0 then
+      Exit(False);
+
+end;
+
 procedure TReflectionMemory.FreeObjects(Key: TCacheKey; ToFree: Integer);
   overload;
 var
   I: Integer;
 begin
-  for i := 0 to ToFree + 1 do
+  for I := 0 to ToFree + 1 do
   begin
+    if HookCache[Ord(Key)][I] = 0 then
+      Continue;
     Reflect.Smart.FreeObject(HookCache[Ord(Key)][I]);
     if HookCache[Ord(Key)][I] = 0 then
       Continue;

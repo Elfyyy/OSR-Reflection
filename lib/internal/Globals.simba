@@ -75,9 +75,24 @@ type
   TTile = TPoint;
   TTileArray = array of TTile;
 
+type THook = record
+  Path: string;
+  Multi: Integer;
+end;
+
+{$IFNDEF CODEINSIGHT}
+type
+  TObjectType = record
+  ObjType: Integer;
+  Flags, Height, Render, Orientation, LocalX, LocalY, OffsetX, OffsetY,
+    Plane, Id, RelativeX, RelativeY, SceneObject: THook;
+end;
+{$ENDIF}
+
 var
   Reflect: TReflectionLib;
   ObjectCache, NpcCache, ItemCache: TStringList;
+  ObjGame, ObjWallDecoration, ObjFloorDecoration, ObjBoundary: TObjectType;
 
   {Constants}
 
