@@ -71,7 +71,7 @@ begin
   if Self.ObjType.Index <> ObjGame.Index then
   begin
     Reflect.Logger.Warn('Only ObjGame has an Offset @.GetOffset');
-    Exit([-1, -1);
+    Exit(Point(-1, -1));
   end;
   LocalTile := Point(Reflect.Smart.GetFieldInt(
     Self.Reference, Self.ObjType.OffsetX), Reflect.Smart.GetFieldInt(
@@ -101,7 +101,7 @@ begin
   Result := Between('''name'': ''', ''',', Line);
 end;
 
-function TReflectObject.GetHeight: Integer; override;
+function TReflectObject.GetHeight: Integer;
 var
   Id: Integer;
   Line: string;
