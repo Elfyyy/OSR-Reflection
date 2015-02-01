@@ -68,16 +68,16 @@ function TReflectObject.GetOffset: TTile;
 var
   LocalTile: TTile;
 begin
+  if Self.ObjType.Index <> ObjGame.Index then
+  begin
+    Reflect.Logger.Warn('Only ObjGame has an Offset @.GetOffset');
+    Exit([-1, -1);
+  end;
   LocalTile := Point(Reflect.Smart.GetFieldInt(
     Self.Reference, Self.ObjType.OffsetX), Reflect.Smart.GetFieldInt(
     Self.Reference, Self.ObjType.OffsetY));
   Result := Point(LocalTile.X + Reflect.Internals.BaseX, LocalTile.Y +
     Reflect.Internals.BaseY);
-end;
-
-function TReflectObject.GetHeight: Integer;
-begin
-  Result := Reflect.Smart.GetFieldInt(Self.Reference, Self.ObjType.Height);
 end;
 
 function TReflectObject.GetOrientation: Integer;
@@ -129,6 +129,8 @@ var
   OffsetX, OffsetY, XShift, YShift: Extended;
   Tile: TPoint;
 begin
+  if Self.ObjType.Index <> ObjGame.Index then
+    Exit(Self.GetTile);
   Tile := Self.GetTile;
   OffsetX := (Tile.X + Self.GetOffset.X) / 2;
   OffsetY := (Tile.Y + Self.GetOffset.Y) / 2;
@@ -244,6 +246,11 @@ begin
     Exit;
   if Self[0].Id = 0 then
   begin
+    if Self[0].ObjType.Index <> ObjGame.Index then
+    begin
+      Reflect.Logger.Warn('Only ObjGame can be searched by name @.Get');
+      Exit;
+    end;
     H := High(Temp);
     SetLength(Temp1, H + 1);
     for I := 0 to H do
@@ -284,13 +291,17 @@ begin
   if Self.Name = '' then
     Temp.Init(Self.ObjType, Self.Id);
   if Self.Id = 0 then
-    Temp.Init(Self.ObjType, Self.Name);
-  Temp.Get(Distance);
-  if Length(temp) = 0 then
   begin
-    Self.Reference := 0;
-    Exit;
+    if Self.ObjType.Index <> ObjGame.Index then
+    begin
+      Reflect.Logger.Warn('Only ObjGame can be searched by name @.Find');
+      Exit(False);
+    end;
+    Temp.Init(Self.ObjType, Self.Name);
   end;
+  Temp.Get(Distance);
+  if Length(Temp) = 0 then
+    Exit;
   if Reflect.Tiles.NearTile(Temp[0].GetTile, Distance) then
   begin
     Result := True;
