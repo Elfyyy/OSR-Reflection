@@ -1,9 +1,9 @@
 
 type
   TReflectObject = record(TReflectPointer)
-  ObjType: TObjectType;
-  Id: Integer;
-  Name: string;
+    ObjType: TObjectType;
+    Id: Integer;
+    Name: string;
 end;
 
   TReflectObjectArray = array of TReflectObject;
@@ -148,7 +148,7 @@ var
   Id: Integer;
   Temp: TReflectObject;
 begin
-  if (Self.ObjType.Index <> 1) then
+  if (Self.ObjType.Index <> ObjGame.Index) then
   begin
     Reflect.Mem.GetObject(ckSceneTile, ckObject, Self.ObjType.SceneObject,
       Iteration, Iteration);
@@ -161,29 +161,8 @@ begin
     Self.Reference := HookCache[ckObject][Iteration];
   end;
 end;
-{$ENDIF}
 
-procedure TReflectObject.GetAt(RealTile: TTile);
-var
-  ObjectHook, SceneHook: THook;
-  Multi, BaseX, BaseY, Plane: Integer;
-  Temp: TReflectObject;
-begin
-  if (HookCache[ckObject][0] <> 0) then
-    Reflect.Mem.FreeObjects(ckObject, True);
-  BaseX := Reflect.Internals.BaseX;
-  BaseY := Reflect.Internals.BaseY;
-  Plane := Reflect.Tiles.GetPlane;
-  if HookCache[TCacheKey.ckRegion][0] = 0 then
-    Reflect.Mem.GetObject(ckNull, ckRegion, Client_Region, 0, 0);
-  Reflect.Mem.Get3DObject(ckRegion, ckSceneTile, Region_SceneTiles, 0, 0, Plane,
-    RealTile.X - BaseX, RealTile.Y - BaseY);
-  Self.GetObject(0);
-  Reflect.Mem.FreeObjects(ckSceneTile, False);
-end;
-
-{$IFNDEF CODEINSIGHT}
-procedure TReflectObjectArray.GetAll(Distance: Integer = 103);
+procedure TReflectObjectArray.GetAll(Distance: Integer);
 var
   Multi, BaseX, BaseY, X, Y, I, Count, Plane, HighX, HighY: integer;
   Temp: TReflectObject;
@@ -224,6 +203,25 @@ begin
     Reflect.Mem.FreeObjects(ckSceneTile, Count);
 end;
 {$ENDIF}
+
+procedure TReflectObject.GetAt(RealTile: TTile);
+var
+  ObjectHook, SceneHook: THook;
+  Multi, BaseX, BaseY, Plane: Integer;
+  Temp: TReflectObject;
+begin
+  if (HookCache[ckObject][0] <> 0) then
+    Reflect.Mem.FreeObjects(ckObject, True);
+  BaseX := Reflect.Internals.BaseX;
+  BaseY := Reflect.Internals.BaseY;
+  Plane := Reflect.Tiles.GetPlane;
+  if HookCache[TCacheKey.ckRegion][0] = 0 then
+    Reflect.Mem.GetObject(ckNull, ckRegion, Client_Region, 0, 0);
+  Reflect.Mem.Get3DObject(ckRegion, ckSceneTile, Region_SceneTiles, 0, 0, Plane,
+    RealTile.X - BaseX, RealTile.Y - BaseY);
+  Self.GetObject(0);
+  Reflect.Mem.FreeObjects(ckSceneTile, False);
+end;
 
 procedure TReflectObjectArray.Get(Distance: Integer = 103);
 var
