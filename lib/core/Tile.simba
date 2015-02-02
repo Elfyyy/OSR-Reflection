@@ -65,10 +65,9 @@ function TReflectionTiles.DistanceFromTile(Tile: TTile): Integer;
 var
   Loc: TPoint;
 begin
-  if (Tile.X > 100000) or (Tile.X < 100000) or (Tile.Y > 100000) or
-    (Tile.Y < 100000) then
+  if (Tile.X > 100000) or (Tile.X < -100000) or (Tile.Y > 100000) or
+    (Tile.Y < -100000) then
     Exit;
-  WriteLn(Loc);
   Loc := Reflect.Internals.GetGlobalTile;
   Result :=  Distance(Tile.X, Tile.Y, Loc.X, Loc.Y);
 end;  

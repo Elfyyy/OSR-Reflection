@@ -1,9 +1,44 @@
 type
   TReflectNPC = record(TReflectActor)
-  DefReference: Integer;
+  DefReference, Id: Integer;
+  Name: string;
 end;
 
   TReflectNPCArray = array of TReflectNPC;
+
+procedure TReflectNPCArray.Init(_Id: Integer);
+begin
+  if Length(Self) = 0 then
+    SetLength(Self, 1);
+  Self[0].Id := _Id;
+end;
+
+procedure TReflectNPCArray.Init(_Name: string); overload;
+begin
+  if Length(Self) = 0 then
+    SetLength(Self, 1);
+  Self[0].Name := _Name;
+end;
+
+procedure TReflectNPCArray.Init; overload;
+begin
+  if Length(Self) = 0 then
+    SetLength(Self, 1);
+end;
+
+procedure TReflectNPC.Init(_Id: Integer);
+begin
+  Self.Id := _Id;
+end;
+
+procedure TReflectNPC.Init(_Name: string); overload;
+begin
+  Self.Name := _Name;
+end;
+
+procedure TReflectNPC.Init; overload;
+begin
+end;
 
 function TReflectNPC.GetIndices: tIntegerArray;
 var
@@ -41,40 +76,24 @@ begin
   Self := Temp;
 end;
 
-procedure TReflectNPCArray.GetAll;
-var
-  Indices: TIntegerArray;
-  H, I, C: Integer;
-  Temp: TReflectNpcArray;
-begin
-  Indices := TReflectNPC.GetIndices;
-  H := High(Indices);
-  SetLength(Self, H);
-  if (HookCache[ckNpcNode][0] <> 0) then
-  begin
-    Reflect.Mem.FreeObjects(ckNpcDef, True);
-    Reflect.Mem.FreeObjects(ckNpcNode, True);
-  end;
-  for I := 0 to H do
-  begin
-    Reflect.Mem.GetObjectArray(
-      ckNull, ckNpcNode, Client_LocalNpcs, I, I, Indices[I]);
-    if (HookCache[ckNpcNode][I] = 0) then
-      Continue;
-    Reflect.Mem.GetObject(ckNpcNode, ckNpcDef, Npc_Definition, I, I);
-    with Self[C] do
-    begin
-      Reference := HookCache[ckNpcNode][I];
-      DefReference := HookCache[ckNpcDef][I];
-      Inc(C);
-    end;
-  end;
-  SetLength(Self, C);
-end;
-
 function TReflectNPC.GetId: Integer;
 begin
   Result := Reflect.Smart.GetFieldInt(Self.DefReference, NpcDefinition_ID);
+end;
+
+function TReflectNPC.GetSizeX: Integer;
+begin
+  Result := Reflect.Smart.GetFieldInt(Self.DefReference, NpcDefinition_SizeX);
+end;
+
+function TReflectNPC.GetSizeY: Integer;
+begin
+  Result := Reflect.Smart.GetFieldInt(Self.DefReference, NpcDefinition_SizeY);
+end;
+
+function TReflectNPC.GetBool: Boolean;
+begin
+  Result := Reflect.Smart.GetFieldBoolean(Self.DefReference, NpcDefinition_Bool);
 end;
 
 function TReflectNPC.GetName: string;
@@ -115,19 +134,61 @@ begin
   Result := StrToInt(Between('combatLevel'': ', ',', Line));
 end;
 
-procedure TReflectNPCArray.Get(Npc: Variant);
+procedure TReflectNPCArray.GetAll;
+var
+  Indices: TIntegerArray;
+  H, I, C: Integer;
+  Temp: TReflectNpcArray;
+begin
+  Indices := TReflectNPC.GetIndices;
+  H := High(Indices);
+  SetLength(Self, H);
+  if (not Reflect.Mem.IsNull(ckNpcDef)) or (not Reflect.Mem.IsNull(ckNpcNode)) then
+  begin
+    Reflect.Mem.FreeObjects(ckNpcDef, True);
+    Reflect.Mem.FreeObjects(ckNpcNode, True);
+  end;
+  for I := 0 to H do
+  begin
+    Reflect.Mem.GetObjectArray(
+      ckNull, ckNpcNode, Client_LocalNpcs, I, I, Indices[I]);
+    if (HookCache[ckNpcNode][I] = 0) then
+      Continue;
+    Reflect.Mem.GetObject(ckNpcNode, ckNpcDef, Npc_Definition, I, I);
+    with Self[C] do
+    begin
+      Reference := HookCache[ckNpcNode][I];
+      DefReference := HookCache[ckNpcDef][I];
+      Inc(C);
+    end;
+  end;
+  SetLength(Self, C);
+end;
+
+procedure TReflectNPCArray.Get;
 var
   Temp, Temp1: TReflectNPCArray;
   I, H, T: Integer;
 begin
+  if Length(Self) = 0 then
+  begin
+    Reflect.Logger.Warn('TReflectNPCArray is not initialized @.Get');
+    Exit;
+  end;
   Temp.GetAll;
-  if Reflect.Misc.VariantIsString(Npc) then
+  if (Self[0].Id = 0) and (Self[0].Name = '') then
+  begin
+    Self := Temp;
+    Self.Sort;
+    Exit;
+  end;
+  if Self[0].Id = 0 then
   begin
     H := High(Temp);
     SetLength(Temp1, H + 1);
     for I := 0 to H do
     begin
-      if (Temp[I].GetName = Npc) then
+      if (Temp[I].GetName = Self[0].Name) then
       begin
         Temp1[T] := Temp[I];
         Inc(T);
@@ -140,7 +201,7 @@ begin
     Setlength(Temp1, H + 1);
     for I := 0 to H do
     begin
-      if (Temp[i].GetId = Npc) then
+      if (Temp[I].GetId = Self[0].Id) then
       begin
         Temp1[T] := Temp[I];
         Inc(T);
@@ -158,7 +219,12 @@ function TReflectNPC.Find(Npc: Variant; Distance: Integer = 144): Boolean;
 var
   Temp: TReflectNPCArray;
 begin
-  Temp.Get(Npc);
+  if (Self.Id = 0) and (Self.Name = '') then
+  begin
+    Reflect.Logger.Warn('TReflectNPC is not initialized @.Find');
+    Exit;
+  end;
+  Temp.Get;
   if Length(Temp) = 0 then
     Exit;
   Temp.Sort;

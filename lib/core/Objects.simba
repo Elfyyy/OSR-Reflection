@@ -25,6 +25,15 @@ begin
   Self[0].Name := _Name;
 end;
 
+procedure TReflectObjectArray.Init(_ObjType: TObjectType); overload;
+begin
+  if Length(Self) = 0 then
+    SetLength(Self, 1);
+  Self[0].ObjType := _ObjType;
+  Self[0].Id := 0;
+  Self[0].Name := '';
+end;
+
 procedure TReflectObject.Init(_ObjType: TObjectType; _Id: Integer);
 begin
   Self.ObjType := _ObjType;
@@ -42,15 +51,6 @@ begin
   Self.ObjType := _ObjType;
   Self.Id := 0;
   Self.Name := '';
-end;
-
-procedure TReflectObjectArray.Init(_ObjType: TObjectType); overload;
-begin
-  if Length(Self) = 0 then
-    SetLength(Self, 1);
-  Self[0].ObjType := _ObjType;
-  Self[0].Id := 0;
-  Self[0].Name := '';
 end;
 
 function TReflectObject.GetTile: TTile;
@@ -232,7 +232,7 @@ var
 begin
   if Length(Self) = 0 then
   begin
-    Reflect.Logger.Warn('TReflectObject is not initialized @.Get');
+    Reflect.Logger.Warn('TReflectObjectArray is not initialized @.Get');
     Exit;
   end;
   if (Self[0].Id = 0) and (Self[0].Name = '')then
