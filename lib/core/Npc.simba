@@ -81,21 +81,6 @@ begin
   Result := Reflect.Smart.GetFieldInt(Self.DefReference, NpcDefinition_ID);
 end;
 
-function TReflectNPC.GetSizeX: Integer;
-begin
-  Result := Reflect.Smart.GetFieldInt(Self.DefReference, NpcDefinition_SizeX);
-end;
-
-function TReflectNPC.GetSizeY: Integer;
-begin
-  Result := Reflect.Smart.GetFieldInt(Self.DefReference, NpcDefinition_SizeY);
-end;
-
-function TReflectNPC.GetBool: Boolean;
-begin
-  Result := Reflect.Smart.GetFieldBoolean(Self.DefReference, NpcDefinition_Bool);
-end;
-
 function TReflectNPC.GetName: string;
 var
   Id: Integer;
