@@ -1,7 +1,10 @@
 type
   TReflectNPC = record(TReflectActor)
+{$IFNDEF CODEINSIGHT}
   DefReference, Id: Integer;
   Name: string;
+  Tile: TTile;
+{$ENDIF}
 end;
 
   TReflectNPCArray = array of TReflectNPC;
@@ -67,11 +70,11 @@ begin
   SetArrayLength(Tpa, L);
   SetArrayLength(Temp, L);
   for I := 0 to L - 1 do
-    Tpa[I] := Self[I].GetTile;
+    Tpa[I] := Self[I].Tile;
   SortTPAFrom(Tpa, Reflect.Internals.GetGlobalTile);
   for I := 0 to L - 1 do
     for C := 0 to L - 1 do
-      if (Tpa[I].Y = Self[C].GetTile.Y) and (Tpa[I].X = Self[C].GetTile.X) then
+      if (Tpa[I].Y = Self[C].Tile.Y) and (Tpa[I].X = Self[C].Tile.X) then
         Temp[I] := Self[C];
   Self := Temp;
 end;
@@ -144,6 +147,7 @@ begin
     begin
       Reference := HookCache[ckNpcNode][I];
       DefReference := HookCache[ckNpcDef][I];
+      Tile := GetTile;
       Inc(C);
     end;
   end;
