@@ -130,7 +130,7 @@ var
 begin
   Indices := TReflectNPC.GetIndices;
   H := High(Indices);
-  SetLength(Self, H);
+  SetLength(Self, H + 1);
   if (not Reflect.Mem.IsNull(ckNpcDef)) or (not Reflect.Mem.IsNull(ckNpcNode)) then
   begin
     Reflect.Mem.FreeObjects(ckNpcDef, True);
@@ -152,6 +152,7 @@ begin
     end;
   end;
   SetLength(Self, C);
+  Self.Sort;
 end;
 
 procedure TReflectNPCArray.Get;
@@ -168,7 +169,6 @@ begin
   if (Self[0].Id = 0) and (Self[0].Name = '') then
   begin
     Self := Temp;
-    Self.Sort;
     Exit;
   end;
   if Self[0].Id = 0 then
@@ -201,7 +201,6 @@ begin
   if (Length(Temp1) = 0) then
     Exit;
   Self := Temp1;
-  Self.Sort;
 end;
 
 function TReflectNPC.Find(Npc: Variant; Distance: Integer = 144): Boolean;
@@ -216,7 +215,6 @@ begin
   Temp.Get;
   if Length(Temp) = 0 then
     Exit;
-  Temp.Sort;
   if Reflect.Tiles.NearTile(Temp[0].GetTile, Distance) then
   begin
     Result := True;
