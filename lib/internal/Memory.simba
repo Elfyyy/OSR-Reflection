@@ -164,6 +164,6 @@ begin
   SetLength(HookCache[TCacheKey.ckNpcName], 100);
   SetLength(HookCache[TCacheKey.ckNpcOverHead], 100);
   SetLength(HookCache[TCacheKey.ckGroundArray], 100);
-  SetLength(HookCache[TCacheKey.ckGroundList], 100);
+  SetLength(HookCache[TCacheKey.ckGroundList], 1000);
   SetLength(HookCache[TCacheKey.ckLocalPlayer], 1);
 end;
