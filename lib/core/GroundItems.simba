@@ -65,7 +65,7 @@ begin
   sortTPAFrom(Tpa, Reflect.Internals.GetGlobalTile);
   for I := 0 to L - 1 do
     for C := 0 to L - 1 do
-      if (Tpa[I].Y = Self[C].Tile.Y) and (tpa[I].X = Self[C].Tile.X) then
+      if (Tpa[I].Y = Self[C].Tile.Y) and (Tpa[I].X = Self[C].Tile.X) then
         Temp[I] := Self[C];
   Self := Temp;
 end;
@@ -213,11 +213,12 @@ begin
   Self := TempArray2;
 end;
 {$ENDIF}
-{
+
 procedure TReflectGroundItemArray.GetAt(RealTile: TTile);
 var
   BaseX, BaseY, Plane: Integer;
 begin
+  Reflect.Mem.FreeObjects(ckGroundList, False);
   BaseX := Reflect.Internals.BaseX;
   BaseY := Reflect.Internals.BaseY;
   Plane := Reflect.Tiles.GetPlane;
@@ -227,19 +228,32 @@ begin
   Reflect.Mem.FreeObjects(ckGroundList, False);
 end;
 
-procedure TReflectGroundItemArray.Get(Item: Variant; Distance: Integer = 103);
+procedure TReflectGroundItemArray.Get(Distance: Integer = 103);
 var
   Temp, Temp1: TReflectGroundItemArray;
   I, H, T: integer;
 begin
+  if Length(Self) = 0 then
+  begin
+    Reflect.Logger.Warn('TReflectGroundItemArray is not initialized @.Get');
+    Exit;
+  end;
+  if (Self[0].Id = 0) and (Self[0].Name = '')then
+  begin
+    Self.GetAll(Distance);
+    Exit;
+  end;
+  Temp := Self;
   Temp.GetAll(Distance);
-  if Reflect.Misc.VariantIsString(Item) then
+  if Length(Temp) = 0 then
+    Exit;
+  if Self[0].Id = 0 then
   begin
     H := High(Temp);
     SetLength(Temp1, H + 1);
     for I := 0 to H do
     begin
-      if (Temp[I].Name = Item) then
+      if (Temp[I].GetName = Self[0].Name) then
       begin
         Temp1[T] := Temp[I];
         Inc(T);
@@ -252,7 +266,7 @@ begin
     Setlength(Temp1, H + 1);
     for I := 0 to H do
     begin
-      if (Temp[I].Id = Item) then
+      if (Temp[I].GetId = Self[0].Id) then
       begin
         Temp1[T] := Temp[I];
         Inc(T);
@@ -264,21 +278,27 @@ begin
   Self.Sort;
 end;
 
-function TReflectGroundItem.Find(Item: Variant; Distance: Integer = 103):
-  Boolean;
+function TReflectGroundItem.Find(
+  Item: Variant; Distance: Integer = 103): Boolean;
 var
   Temp: TReflectGroundItemArray;
 begin
-  Temp.Get(Item, Distance);
-  if Length(Temp) = 0 then
+  if (Self.Name = '') and (Self.Id = 0) then
   begin
-    //Self.Null;
+    Reflect.Logger.Warn('TReflectGroundItem is not initialized @ .Find');
     Exit;
   end;
+  if Self.Name = '' then
+    Temp.Init(Self.Id);
+  if Self.Id = 0 then
+    Temp.Init(Self.Name);
+  Temp.Get(Distance);
+  if Length(Temp) = 0 then
+    Exit;
   Temp.Sort;
-  if Reflect.Tiles.NearTile(Temp[0].Tile, Distance) then
+  if Reflect.Tiles.NearTile(Temp[0].GetTile, Distance) then
   begin
     Result := True;
     Self := Temp[0];
   end;
-end; }
+end;
