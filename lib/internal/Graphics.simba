@@ -1,6 +1,7 @@
 {Credits to Flight & AeroLib for most of Graphics.simba}
 
 {$IFNDEF AL}
+{$IFNDEF SRL5}
 const
   clBlack = 0;
   clWhite = 16777215;
@@ -21,6 +22,7 @@ const
   clMaroon = 128;
   clOutline_black = 65536;
   clOutline_white = 16777215;
+{$ENDIF SRL5}
 {$ENDIF AL}
 
 var

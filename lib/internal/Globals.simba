@@ -216,6 +216,7 @@ const
   Widget_Magic_Container = 218;
 
 {$IFNDEF AL}
+{$IFNDEF SRL5}
     {Keyboard}
 
   Vk_Enter = {$IFDEF LINUX}10{$ELSE}Vk_Return{$ENDIF};
@@ -257,6 +258,7 @@ const
   Time_Bare   = 3;
   Time_Fstop  = 4;
 
+{$ENDIF SRL5}
 {$ENDIF AL}
 
     {Login}
