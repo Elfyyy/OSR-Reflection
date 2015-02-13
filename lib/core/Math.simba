@@ -8,6 +8,7 @@ Supporting math functions.
 
 *)
 {$IFNDEF AL}
+{$IFNDEF SRL5}
 const
   MATH_PI = 3.14159265358979320;
   MATH_2PI = MATH_PI * 2.0;
@@ -35,6 +36,7 @@ const
   __gauss_norm_2 = 0.076542912;
   __gauss_norm_3 = 0.252408784;
   __gauss_norm_4 = 3.949846138;
+{$ENDIF SRL5}
 {$ENDIF AL}
 
 (*
