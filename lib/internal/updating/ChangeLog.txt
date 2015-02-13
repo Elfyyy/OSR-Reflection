@@ -1,5 +1,7 @@
 [Reflection]
- Update # 9:[Bugs]:Fixed a few Memory managing bugs.
+ Update # 6:
+  [Bugs]:
+   Fixed ID error in Inventory.
   [Improvements]:
- Full Prayer support 
+   Added this changelog. 
 [End]
