@@ -218,21 +218,17 @@ begin
   Result := Pnt;
 end;
 
-function TReflectInvItemArray.IsFull: Boolean;
-var
-  I, C: Integer;
-  RItems: TReflectInvItemArray;
-begin
-  RItems.GetAll;
-  Result := Length(RItems) = 28;
-end;
-
-function TReflectInvItemArray.Count: Integer;
+function TReflectionInv.Count: Integer;
 var
   I: Integer;
-  RItems: TReflectInvItemArray;
+  _Items: TReflectInvItemArray;
 begin
-  RItems.GetAll;
-  Result := Length(RItems);
+  _Items.GetAll;
+  Result := Length(_Items);
+end;
+
+function TReflectionInv.IsFull: Boolean;
+begin
+  Result := Reflect.Inv.Count = 28;
 end;
 
