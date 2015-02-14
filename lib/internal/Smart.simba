@@ -86,7 +86,7 @@ procedure TReflectionSmart.Create(
   Width, Height: Integer; UserAgent: string); overload;
 var
   World: Variant;
-  JavaString: String;
+  JavaString: string;
 begin
   Self.Width := Width;
   Self.Height := Height;
@@ -96,7 +96,7 @@ begin
     Exit;
   World := Self.GetWorld;
   Reflect.Logger.Status('Using world %s.', [World]);
-  if (SmartShowConsole) then
+  if SmartShowConsole then
     JavaString:= 'java.exe'
   else
     JavaString:= 'javaw.exe';
