@@ -1,16 +1,115 @@
 
 type
-  TReflectInvItem = record(TReflectItem)
-    InvSlot, Quantity: Integer;
+  TReflectInvItem = record(TReflectPointer)
+{$IFNDEF CODEINSIGHT}
+    InvSlot, Id: Integer;
+    Name: string;
+{$ENDIF}
   end;
 
   TReflectInvItemArray = Array of TReflectInvItem;
 
+procedure TReflectInvItemArray.Init(_Id: Integer);
+begin
+  if Length(Self) = 0 then
+    SetLength(Self, 1);
+  Self[0].Id := _Id;
+end;
+
+procedure TReflectInvItemArray.Init(_Name: string);
+  overload;
+begin
+  if Length(Self) = 0 then
+    SetLength(Self, 1);
+  Self[0].Name := _Name;
+end;
+
+procedure TReflectInvItemArray.Init; overload;
+begin
+  if Length(Self) = 0 then
+    SetLength(Self, 1);
+  Self[0].Id := 0;
+  Self[0].Name := '';
+end;
+
+procedure TReflectInvItem.Init(_Id: Integer);
+begin
+  Self.Id := _Id;
+end;
+
+procedure TReflectInvItem.Init(_Name: string); overload;
+begin
+  Self.Name := _Name;
+end;
+
+procedure TReflectInvItem.Init; overload;
+begin
+  Self.Id := 0;
+  Self.Name := '';
+end;
+
+function TReflectInvItem.GetName: string;
+var
+  Line: string;
+  Id: Integer;
+begin
+  Id := Self.Id;
+  Line := ItemCache.GetStrings(Id);
+  Result := Between('''name'': ''', ''',', Line);
+end;
+
+function TReflectInvItem.GetInvActions: TStringArray;
+var
+  Line, Temp: string;
+  Id: Integer;
+begin
+  Id := Self.Id;
+  Line := ItemCache.GetStrings(Id);
+  Temp := Between('''actions'': [''', ']', Line);
+  Temp := Copy(Temp, 1, Length(Temp) - 1);
+  Result := Explode(''',''',Temp);
+end;
+
+function TReflectInvItem.GetGroundActions: TStringArray;
+var
+  Line, Temp: string;
+  Id: Integer;
+begin
+  Id := Self.Id;
+  Line := ItemCache.GetStrings(Id);
+  Temp := Between('''groundActions'': [''', ']', Line);
+  Temp := Copy(Temp, 1, Length(Temp) - 1);
+  Result := Explode(''',''',Temp);
+end;
+
+function TReflectInvItem.GetHighAlchValue: Integer;
+var
+  Line: string;
+  Id: Integer;
+begin
+  Id := Self.Id;
+  Line := ItemCache.GetStrings(Id);
+  Result := StrToInt(Between('highAlchValue'': ', '}', Line));
+end;
+
+function TReflectInvItem.GetQuantity: Integer;
+begin
+  Result := Reflect.Smart.GetFieldArrayInt(Self.Reference,
+        Widget_StackSizes, Self.InvSlot - 1);
+end;
+
+function TReflectInvItem.GetId: Integer;
+begin
+  Result := Self.Id;
+end;
+
+{$IFNDEF CODEINSIGHT}
 procedure TReflectInvItemArray.GetAll;
 var
   I, TheId, TheQuantity, Count: Integer;
   InvWidget: TReflectWidget;
 begin
+  Reflect.Mem.FreeObjects(ckInvItems, False);
   InvWidget.GetWidget(WIDGET_Inventory_Container, 0);
   for I := 0 to 27 do
   begin
@@ -20,51 +119,44 @@ begin
     begin
       Inc(Count);
       SetLength(Self, Count);
-      TheQuantity := Reflect.Smart.GetFieldArrayInt(InvWidget.Reference,
-        Widget_StackSizes, I);
+      TheQuantity
       with Self[Count - 1] do
       begin
+        Reference := InvWidget.Reference;
         Id := TheId - 1;
-        LoadDef;
-        Quantity := TheQuantity - 1;
         InvSlot := I + 1;
       end;
     end;
   end;
-  InvWidget.Free;
 end;
+{$ENDIF}
 
-  {Credit Boreas}
-function TReflectionInternals.InvBox(I : Integer): TBox;
-var
-  Slot1, Slot6: TBox;
-begin
-  if not InRange(I, 1, 28) then
-  begin
-    Reflect.Logger.Warn('Incorrect index: %d', [I]);
-    Exit;
-  end;
-  Slot1 := [563, 213, 594, 244];
-  Slot6 := [605, 249, 31415, 92653];
-  Result.X1 := Slot1.X1 + ((((I + 3) mod 4)) * (Slot6.X1 - Slot1.X1));
-  Result.Y1 := Slot1.Y1 + ((((I - 1) div 4)) * (Slot6.Y1 - Slot1.Y1));
-  Result.X2 := Result.X1 + (Slot1.X2 - Slot1.X1);
-  Result.Y2 := Result.Y1 + (Slot1.Y2 - Slot1.Y1);
-end;
-
-procedure TReflectInvItemArray.Get(Item: Variant);
+procedure TReflectInvItemArray.Get;
 var
   Temp, Temp1: TReflectInvItemArray;
   I, H, T: integer;
 begin
+  if Length(Self) = 0 then
+  begin
+    Reflect.Logger.Warn('TReflectInvItemArray is not initialized @.Get');
+    Exit;
+  end;
+  if (Self[0].Id = 0) and (Self[0].Name = '')then
+  begin
+    Self.GetAll;
+    Exit;
+  end;
+  Temp := Self;
   Temp.GetAll;
-  if Reflect.Misc.VariantIsString(Item) then
+  if Length(Temp) = 0 then
+    Exit;
+  if Self[0].Id = 0 then
   begin
     H := High(Temp);
     SetLength(Temp1, H + 1);
     for I := 0 to H do
     begin
-      if (Temp[I].Name = Item) then
+      if (Temp[I].GetName = Self[0].Name) then
       begin
         Temp1[T] := Temp[I];
         Inc(T);
@@ -77,7 +169,7 @@ begin
     Setlength(Temp1, H + 1);
     for I := 0 to H do
     begin
-      if (Temp[i].Id = Item) then
+      if (Temp[I].GetId = Self[0].Id) then
       begin
         Temp1[T] := Temp[I];
         Inc(T);
@@ -88,27 +180,42 @@ begin
   Self := Temp1;
 end;
 
-function TReflectInvItem.Find(Item: Variant): Boolean;
+function TReflectInvItem.Find: Boolean;
 var
   Temp: TReflectInvItemArray;
 begin
-  Temp.Get(Item);
-  if Length(Temp) = 0 then
+  if (Self.Name = '') and (Self.Id = 0) then
+  begin
+    Reflect.Logger.Warn('TReflectInvItem is not initialized @ .Find');
     Exit;
-  Self := Temp[0];
-  Result := True;
+  end;
+  if Self.Name = '' then
+    Temp.Init(Self.Id);
+  if Self.Id = 0 then
+    Temp.Init(Self.Name);
+  Temp.Get;
+  if Length(Temp) > 0 then
+  begin
+    Result := True;
+    Self := Temp[0];
+  end;
 end;
 
-function TReflectInvItem.Click(ClickType: Integer):
-  Boolean;
+function TReflectInvItem.GetMainScreenPoint: TPoint;
 var
-  Box: TBox;
+  Slot1, Slot6, Temp: TBox;
+  Pnt: TPoint;
 begin
-  if Self.InvSlot < 0 then
+  if not InRange(Self.InvSlot, 1, 28) then
     Exit;
-  Box := Reflect.Internals.InvBox(Self.InvSlot);
-  Reflect.Mouse.Move(Box, ClickType);
-  Result := True;
+  Slot1 := [563, 213, 594, 244];
+  Slot6 := [605, 249, 31415, 92653];
+  Temp.X1 := Slot1.X1 + ((((Self.InvSlot + 3) mod 4)) * (Slot6.X1 - Slot1.X1));
+  Temp.Y1 := Slot1.Y1 + ((((Self.InvSlot - 1) div 4)) * (Slot6.Y1 - Slot1.Y1));
+  Temp.X2 := Temp.X1 + (Slot1.X2 - Slot1.X1);
+  Temp.Y2 := Temp.Y1 + (Slot1.Y2 - Slot1.Y1);
+  Reflect.Math.GaussBox(Pnt.X, Pnt.Y, Temp.X1, Temp.Y1, Temp.X2, Temp.Y2);
+  Result := Pnt;
 end;
 
 function TReflectInvItemArray.IsFull: Boolean;

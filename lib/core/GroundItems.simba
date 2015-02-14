@@ -160,7 +160,6 @@ begin
   begin
     Id := Reflect.Smart.GetFieldInt(
       HookCache[ckGroundList][Start + Iteration + 1], Item_Id);
-    //Writeln(Id);
     if (Id < 0) or (Id > 10000) then
       Break;
     Temp[Iteration].Id := Id;
@@ -170,8 +169,6 @@ begin
       HookCache[ckGroundList][Start + Iteration + 1];
     Reflect.Mem.GetObject(
       ckGroundList, ckGroundList, Node_Next, Start + Iteration + 2, Start + Iteration + 1);
-      //ClearDebug;
-      //WriteLn(HookCache[ckGroundList]);
     Inc(Iteration);
   end;
   SetLength(Temp, Iteration);
@@ -282,8 +279,7 @@ begin
   Self.Sort;
 end;
 
-function TReflectGroundItem.Find(
-  Item: Variant; Distance: Integer = 103): Boolean;
+function TReflectGroundItem.Find(Distance: Integer = 103): Boolean;
 var
   Temp: TReflectGroundItemArray;
 begin
