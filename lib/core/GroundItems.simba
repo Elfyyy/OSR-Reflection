@@ -86,7 +86,6 @@ var
   Id: Integer;
 begin
   Id := Self.GetId;
-  //WriteLn(Id);
   Line := ItemCache.GetStrings(Id);
   Result := Between('''name'': ''', ''',', Line);
 end;
@@ -128,6 +127,11 @@ end;
 function TReflectGroundItem.GetTile: TTile;
 begin
   Result := Self.Tile;
+end;
+
+function TReflectGroundItem.GetMainScreenPoint: TPoint;
+begin
+  Result := Reflect.Tiles.TileToMs(Self.GetTile);
 end;
 
 {$IFNDEF CODEINSIGHT}
