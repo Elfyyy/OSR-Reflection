@@ -122,6 +122,11 @@ begin
   Result := StrToInt(Between('combatLevel'': ', ',', Line));
 end;
 
+function TReflectNPC.GetMSPoint: TPoint;
+begin
+  Result := Reflect.Tiles.TileToMs(Self.GetTile);
+end;
+
 procedure TReflectNPCArray.GetAll;
 var
   Indices: TIntegerArray;

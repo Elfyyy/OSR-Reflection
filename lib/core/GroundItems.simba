@@ -129,7 +129,7 @@ begin
   Result := Self.Tile;
 end;
 
-function TReflectGroundItem.GetMainScreenPoint: TPoint;
+function TReflectGroundItem.GetMSPoint: TPoint;
 begin
   Result := Reflect.Tiles.TileToMs(Self.GetTile);
 end;

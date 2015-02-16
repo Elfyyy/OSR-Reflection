@@ -149,7 +149,7 @@ begin
   Result := Explode(''',''',Temp);
 end;
 
-function TReflectObject.GetMainScreenPoint: TPoint;
+function TReflectObject.GetMSPoint: TPoint;
 var
   OffsetX, OffsetY, XShift, YShift: Extended;
   Tile: TPoint;
