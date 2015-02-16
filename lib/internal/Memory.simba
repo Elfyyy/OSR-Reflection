@@ -9,14 +9,12 @@ Memory.Simba
   free'd, helping avoid potential leaks. In order to acess the "HookCache"
   the enums "TCacheKey" will be used in order to be more efficient during
   runtime.
-  Only "Objects.Simba", "GroundItems.Simba", & "Npc.Simba" will utilize Caching
-  as no other methods benefit from it.
 *)
 
 type
   TCacheKey = (ckNull, ckRegion, ckSceneTile, ckObject, ckNpcNode, ckNpcDef,
   ckNpcName, ckNpcOverHead, ckGroundArray, ckGroundList, ckLocalPlayer,
-  ckInvItems);
+  ckInvItems, ckBankItems);
 
 var
   HookCache: T2DIntegerArray;
@@ -155,17 +153,18 @@ begin
   ItemCache.LoadFromFile(
     IncludePath + 'reflection\lib\internal\ItemDefs.txt');
   AddOnTerminate('ReflectFree');
-  SetLength(HookCache, 12);
-  SetLength(HookCache[TCacheKey.ckNull], 10817);
-  SetLength(HookCache[TCacheKey.ckSceneTile], 10817);
-  SetLength(HookCache[TCacheKey.ckObject], 10817);
-  SetLength(HookCache[TCacheKey.ckRegion], 10817);
-  SetLength(HookCache[TCacheKey.ckNpcNode], 100);
-  SetLength(HookCache[TCacheKey.ckNpcDef], 100);
-  SetLength(HookCache[TCacheKey.ckNpcName], 100);
-  SetLength(HookCache[TCacheKey.ckNpcOverHead], 100);
-  SetLength(HookCache[TCacheKey.ckGroundArray], 100);
-  SetLength(HookCache[TCacheKey.ckGroundList], 1000);
-  SetLength(HookCache[TCacheKey.ckInvItems], 28);
-  SetLength(HookCache[TCacheKey.ckLocalPlayer], 1);
+  SetLength(HookCache, 13);
+  SetLength(HookCache[ckNull], 10817);
+  SetLength(HookCache[ckSceneTile], 10817);
+  SetLength(HookCache[ckObject], 10817);
+  SetLength(HookCache[ckRegion], 10817);
+  SetLength(HookCache[ckNpcNode], 100);
+  SetLength(HookCache[ckNpcDef], 100);
+  SetLength(HookCache[ckNpcName], 100);
+  SetLength(HookCache[ckNpcOverHead], 100);
+  SetLength(HookCache[ckGroundArray], 100);
+  SetLength(HookCache[ckGroundList], 1000);
+  SetLength(HookCache[ckInvItems], 28);
+  SetLength(HookCache[ckBankItems], 800);
+  SetLength(HookCache[ckLocalPlayer], 1);
 end;
