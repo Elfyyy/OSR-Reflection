@@ -74,6 +74,9 @@
 (Reflection\Lib\Misc\Logger.simba)
 (https://raw.githubusercontent.com/Elfyyy/OSR-Reflection/master/lib/misc/Logger.simba)
 
+(Reflection\Lib\Internal\Graphics.simba)
+(https://raw.githubusercontent.com/Elfyyy/OSR-Reflection/master/lib/internal/Graphics.simba)
+
 (Reflection\Lib\Misc\Misc.simba)
 (https://raw.githubusercontent.com/Elfyyy/OSR-Reflection/master/lib/misc/Misc.simba)
 

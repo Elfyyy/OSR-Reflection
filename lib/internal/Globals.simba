@@ -5,22 +5,20 @@
   {$ENDIF OS_SMART}
 {$ENDIF AL_VERSION_MAIN}
 
-{$IFNDEF AL}
 type
-  TGraphics = record
-    __Bmp: TMufasaBitmap;
-    __Init: boolean;
-    __Width: Integer;
-    __Height: Integer;
-end;
-{$ENDIF AL}
+  TReflectionGraphics = record
+    Bmp: TMufasaBitmap;
+    IsInit: Boolean;
+    Width: Integer;
+    Height: Integer;
+  end;
 
 type
   TReflectionSmart = record
     Target, PID: Integer;
     Width, Height: Integer;
     ForceNew: Boolean;
-    Graphics: TGraphics;
+    Graphics: TReflectionGraphics;
     UserAgent: string;
   end;
 
@@ -72,6 +70,7 @@ type
     Time: TReflectionTime;
     MouseSpeed: Integer;
     Inv: TReflectionInventory;
+    Graphics: TReflectionGraphics;
   end;
 
   TTile = TPoint;
