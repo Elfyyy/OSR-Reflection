@@ -1,16 +1,4 @@
 
-type
-  TReflectObject = record(TReflectPointer)
-{$IFNDEF CODEINSIGHT}
-    Id: Integer;
-    ObjType: TObjectType;
-    Name: string;
-    Tile: TTile;
-{$ENDIF}
-end;
-
-  TReflectObjectArray = array of TReflectObject;
-
 {*Credit Widget, Modified by Lordsaturn*}
 procedure TReflectObjectArray.Sort;
 var
@@ -25,7 +13,7 @@ begin
   SetArrayLength(Temp, L);
   for I := 0 to L - 1 do
     Tpa[I] := Self[I].Tile;
-  SortTPAFrom(Tpa, Reflect.Internals.GetGlobalTile);
+  SortTPAFrom(Tpa, Reflect.Tiles.GetGlobalTile);
   for I := 0 to L - 1 do
     for C := 0 to L - 1 do
       if (Tpa[I].Y = Self[C].Tile.Y) and (Tpa[I].X = Self[C].Tile.X) then
@@ -40,8 +28,8 @@ begin
   LocalTile := Point(Reflect.Smart.GetFieldInt(
     Self.Reference, Self.ObjType.LocalX), Reflect.Smart.GetFieldInt(
     Self.Reference, Self.ObjType.LocalY));
-  Result := Point(LocalTile.X + Reflect.Internals.BaseX, LocalTile.Y +
-    Reflect.Internals.BaseY);
+  Result := Point(LocalTile.X + Reflect.Misc.BaseX, LocalTile.Y +
+    Reflect.Misc.BaseY);
 end;
 
 function TReflectObject.GetOffset: TTile;
@@ -56,8 +44,8 @@ begin
   LocalTile := Point(Reflect.Smart.GetFieldInt(
     Self.Reference, Self.ObjType.OffsetX), Reflect.Smart.GetFieldInt(
     Self.Reference, Self.ObjType.OffsetY));
-  Result := Point(LocalTile.X + Reflect.Internals.BaseX, LocalTile.Y +
-    Reflect.Internals.BaseY);
+  Result := Point(LocalTile.X + Reflect.Misc.BaseX, LocalTile.Y +
+    Reflect.Misc.BaseY);
 end;
 
 function TReflectObject.GetOrientation: Integer;
@@ -155,12 +143,12 @@ var
 begin
   if not Reflect.Mem.IsNull(ckObject) then
     Reflect.Mem.FreeObjects(ckObject, True);
-  Position := Reflect.Internals.GetGlobalTile;
+  Position := Reflect.Tiles.GetGlobalTile;
   Distance := Round(Distance / 2);
   if HookCache[TCacheKey.ckRegion][0] = 0 then
     Reflect.Mem.GetObject(ckNull, ckRegion, Client_Region, 0, 0);
-  BaseX := Reflect.Internals.BaseX;
-  BaseY := Reflect.Internals.BaseY;
+  BaseX := Reflect.Misc.BaseX;
+  BaseY := Reflect.Misc.BaseY;
   Position := Point(Position.X - BaseX, Position.Y - BaseY);
   Plane := Reflect.Tiles.GetPlane;
   HighX := Position.X + Distance;
@@ -196,8 +184,8 @@ var
 begin
   if (HookCache[ckObject][0] <> 0) then
     Reflect.Mem.FreeObjects(ckObject, True);
-  BaseX := Reflect.Internals.BaseX;
-  BaseY := Reflect.Internals.BaseY;
+  BaseX := Reflect.Misc.BaseX;
+  BaseY := Reflect.Misc.BaseY;
   Plane := Reflect.Tiles.GetPlane;
   if HookCache[TCacheKey.ckRegion][0] = 0 then
     Reflect.Mem.GetObject(ckNull, ckRegion, Client_Region, 0, 0);

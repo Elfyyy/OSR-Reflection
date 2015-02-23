@@ -10,9 +10,9 @@ function TReflectActor.GetTile: TTile;
 begin
   if Reflect.Smart.IsNull(Self.Reference) then
     Exit(Point(-1, -1));
-  Result.X := Reflect.Internals.BaseX +
+  Result.X := Reflect.Misc.BaseX +
     Reflect.Smart.GetFieldInt(Self.Reference, Actor_WorldX) div 128;
-  Result.Y:= Reflect.Internals.BaseY +
+  Result.Y:= Reflect.Misc.BaseY +
     Reflect.Smart.GetFieldInt(Self.Reference, Actor_WorldY) div 128;
 end;
 
@@ -21,9 +21,9 @@ begin
   if Reflect.Smart.IsNull(Self.Reference) then
     Exit(Point(-1, -1));
   Result := Point(Reflect.Smart.GetFieldArrayInt(
-    Self.Reference, Actor_QueueX, Index) + Reflect.Internals.BaseX,
+    Self.Reference, Actor_QueueX, Index) + Reflect.Misc.BaseX,
     Reflect.Smart.GetFieldArrayInt(Self.Reference, Actor_QueueY, 0) +
-    Reflect.Internals.BaseY);
+    Reflect.Misc.BaseY);
 end;
 
 function TReflectActor.GetAnimation: Integer;
@@ -73,12 +73,5 @@ function TReflectActor.IsUnderAttack: Boolean;
 begin
   if Reflect.Smart.IsNull(Self.Reference) then
     Exit;
-  Result := (Self.GetCombatCycle > Reflect.Internals.GetClientLoopCycle);
-end;
-
-function TReflectActor.UnderAttack: Boolean;
-begin
-  Reflect.Logger.Warn('Please change %s to %s.',
-    ['TReflectActor.UnderAttack', 'TReflectActor.IsUnderAttack']);
-  Result := Self.IsUnderAttack;
+  Result := (Self.GetCombatCycle > Reflect.Misc.GetClientLoopCycle);
 end;

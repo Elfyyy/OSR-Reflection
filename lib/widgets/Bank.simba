@@ -1,12 +1,4 @@
 
-type
-  TReflectBankItem = record(TReflectPointer)
-  Id, Slot: Integer;
-  Name: string;
-end;
-
-TReflectBankItemArray = array of TReflectBankItem;
-
 function TReflectionBank.IsOpen: Boolean; forward;
 function TReflectionBank.ItemCount: Integer; forward;
 
@@ -15,7 +7,7 @@ var
   Line: string;
   Id: Integer;
 begin
-  Id := Self.Id;
+  Id := Self._Id;
   Line := ItemCache.GetStrings(Id);
   Result := Between('''name'': ''', ''',', Line);
 end;
@@ -25,7 +17,7 @@ var
   Line, Temp: string;
   Id: Integer;
 begin
-  Id := Self.Id;
+  Id := Self._Id;
   Line := ItemCache.GetStrings(Id);
   Temp := Between('''actions'': [''', ']', Line);
   Temp := Copy(Temp, 1, Length(Temp) - 1);
@@ -37,7 +29,7 @@ var
   Line, Temp: string;
   Id: Integer;
 begin
-  Id := Self.Id;
+  Id := Self._Id;
   Line := ItemCache.GetStrings(Id);
   Temp := Between('''groundActions'': [''', ']', Line);
   Temp := Copy(Temp, 1, Length(Temp) - 1);
@@ -49,7 +41,7 @@ var
   Line: string;
   Id: Integer;
 begin
-  Id := Self.Id;
+  Id := Self._Id;
   Line := ItemCache.GetStrings(Id);
   Result := StrToInt(Between('highAlchValue'': ', '}', Line));
 end;
@@ -57,12 +49,17 @@ end;
 function TReflectBankItem.GetQuantity: Integer;
 begin
   Result := Reflect.Smart.GetFieldArrayInt(Self.Reference,
-        Widget_StackSizes, Self.Slot - 1);
+        Widget_StackSizes, Self._Slot - 1);
 end;
 
 function TReflectBankItem.GetId: Integer;
 begin
-  Result := Self.Id;
+  Result := Self._Id;
+end;
+
+function TReflectBankItem.GetSlot: Integer;
+begin
+  Result := Self._Slot;
 end;
 
 procedure TReflectBankItemArray.GetAll;
@@ -81,7 +78,7 @@ begin
   for I := 0 to ItemCount - 1 do
   begin
     BankChild.GetChild(BankWidget, I);
-    Temp[I].Id := BankChild.GetItemId;
+    Temp[I]._Id := BankChild.GetItemId;
     HookCache[ckBankItems][I] := BankChild.Reference;
     Temp[I].Reference := BankChild.Reference;
   end;
@@ -177,7 +174,7 @@ begin
     BankChild.Free;
     Exit;
   end;
-  if Reflect.Internals.OptionExists(IntToStr(Amount) + ' ') then
+  if Reflect.Text.OptionExists(IntToStr(Amount) + ' ') then
     Result := Reflect.Text.ChooseOption(IntToStr(Amount) + ' ')
   else
   begin
@@ -213,8 +210,8 @@ begin
   for I := 0 to ItemCount - 1 do
   begin
     BankChild.GetChild(BankWidget, I);
-    Temp.Id := BankChild.GetItemId;
-    if Temp.Id = Item.Id then
+    Temp._Id := BankChild.GetItemId;
+    if Temp._Id = Item._Id then
     begin
       BankWidget.Free;
       Exit(BankChild);
@@ -230,9 +227,8 @@ var
   TimeOut: TReflectTimer;
   Center: TPoint;
 begin
-  if (not Reflect.Bank.IsOpen) or (Self.Id = 0) then
+  if (not Reflect.Bank.IsOpen) or (Self._Id = 0) then
     Exit(False);
-
   BankChild := Reflect.Internals.GetBankItem(Self);
   Center := MiddleBox(BankChild.GetBounds);
   if (not BankChild.IsHidden)and(PointInBox(Center,[22, 80, 480, 292])) then
@@ -248,7 +244,7 @@ begin
       (not PointInBox(Center,[22, 80, 480, 292]))) do
     begin
       BankChild.Free;
-      Reflect.KeyBoard.TypeSend(Self.Name[L], False);
+      Reflect.KeyBoard.TypeSend(Self._Name[L], False);
       Wait(RandomRange(500, 700));
       BankChild := Reflect.Internals.GetBankItem(Self);
       Center := MiddleBox(BankChild.GetBounds);

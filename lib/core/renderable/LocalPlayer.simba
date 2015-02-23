@@ -1,8 +1,3 @@
-type
-  TReflectLocalPlayer = record(TReflectActor)
-  Username, Password, Pin: string;
-  Active: Boolean;
-end;
 
 procedure TReflectLocalPlayer.Create;
 begin
@@ -108,27 +103,27 @@ end;
 
 function TReflectLocalPlayer.IsAutoRetaliateOn: Boolean;
 begin
-  Result := Reflect.Internals.GetSetting(172) = 0;
+  Result := Reflect.Misc.GetSetting(172) = 0;
 end;
 
 function TReflectLocalPlayer.IsRunOn: Boolean;
 begin
-  Result := Reflect.Internals.GetSetting(173) = 1;
+  Result := Reflect.Misc.GetSetting(173) = 1;
 end;
 
 function TReflectLocalPlayer.IsPoisoned: Boolean;
 begin
-  Result := Reflect.Internals.GetSetting(102) > 0;
+  Result := Reflect.Misc.GetSetting(102) > 0;
 end;
 
 function TReflectLocalPlayer.AutoCasting: Boolean;
 begin
-  Result := Reflect.Internals.GetSetting(108) > 0;
+  Result := Reflect.Misc.GetSetting(108) > 0;
 end;
 
 function TReflectLocalPlayer.GetSpecPercent: Integer;
 begin
-  Result := Reflect.Internals.GetSetting(300) div 10;
+  Result := Reflect.Misc.GetSetting(300) div 10;
 end;
 
 function TReflectLocalPlayer.GetWeight: Integer;
@@ -146,9 +141,9 @@ begin
   if Reflect.Smart.GetFieldInt(0, Client_DestinationX) = 0 then
     Exit(Self.GetTile);
   Result := Point(Reflect.Smart.GetFieldInt(
-    0, Client_DestinationX) + Reflect.Internals.BaseX,
+    0, Client_DestinationX) + Reflect.Misc.BaseX,
     Reflect.Smart.GetFieldInt(0, Client_DestinationY) +
-    Reflect.Internals.BaseY);
+    Reflect.Misc.BaseY);
 end;
 
 function TReflectLocalPlayer.FFlag(
@@ -286,8 +281,8 @@ var
   CTRLPoints: TPointArray;
 begin
   repeat
-  OurTile := Reflect.Internals.GetGlobalTile;
-  CtrlPoints := Reflect.Internals.WindPath(
+  OurTile := Reflect.Tiles.GetGlobalTile;
+  CtrlPoints := Reflect.Map.WindPath(
     OurTile.x, OurTile.y, Tile.x, Tile.y, 5.0, 2.5, 0.0, 0.0, 1.5, 1.0);
   Inc(Tries);
   if(Tries > 20)then
@@ -305,7 +300,7 @@ function TReflectLocalPlayer.BlindWalkMM(
   Tile: TTile; Dist: Integer = 5): Boolean;
 begin
   Result := (Reflect.Map.TileOnMM(Tile) and Self.WalkToTileMM(Tile)) or
-    Self.WalkPathMM(Reflect.Internals.WindPath(
+    Self.WalkPathMM(Reflect.Map.WindPath(
       Self.GetTile.X, Self.GetTile.Y, Tile.X, Tile.Y,
       5.0, 2.5, 0.0, 0.0, 1.0, 1.0));
 end;

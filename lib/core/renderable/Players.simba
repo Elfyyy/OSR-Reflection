@@ -1,11 +1,3 @@
-type
-  TReflectPlayer = record(TReflectActor)
-    Name: string;
-    Animation, Health, MaxHealth, InteractingIndex, CombatCycle: Integer;
-    Tile, Queue: TTile;
-end;
-
-  TReflectPlayerArray = array of TReflectPlayer;
 
 procedure TReflectPlayerArray.GetAll;
 var

@@ -1,15 +1,4 @@
 
-type
-  TReflectGroundItem = record(TReflectPointer)
-{$IFNDEF CODEINSIGHT}
-    Id: Integer;
-    Name: string;
-    Tile: TTile;
-{$ENDIF}
-end;
-
-  TReflectGroundItemArray = array of TReflectGroundItem;
-
 procedure TReflectGroundItemArray.Sort;
 var
   I, C, L: integer;
@@ -22,11 +11,11 @@ begin
   SetArrayLength(Tpa, L);
   SetArrayLength(Temp, L);
   for I := 0 to L - 1 do
-    Tpa[I] := Self[I].Tile;
-  sortTPAFrom(Tpa, Reflect.Internals.GetGlobalTile);
+    Tpa[I] := Self[I]._Tile;
+  sortTPAFrom(Tpa, Reflect.Tiles.GetGlobalTile);
   for I := 0 to L - 1 do
     for C := 0 to L - 1 do
-      if (Tpa[I].Y = Self[C].Tile.Y) and (Tpa[I].X = Self[C].Tile.X) then
+      if (Tpa[I].Y = Self[C]._Tile.Y) and (Tpa[I].X = Self[C]._Tile.X) then
         Temp[I] := Self[C];
   Self := Temp;
 end;
@@ -44,20 +33,20 @@ end;
 function TReflectGroundItem.GetName: string;
 var
   Line: string;
-  Id: Integer;
+  _Id: Integer;
 begin
-  Id := Self.GetId;
-  Line := ItemCache.GetStrings(Id);
+  _Id := Self.GetId;
+  Line := ItemCache.GetStrings(_Id);
   Result := Between('''name'': ''', ''',', Line);
 end;
 
 function TReflectGroundItem.GetInvActions: TStringArray;
 var
   Line, Temp: string;
-  Id: Integer;
+  _Id: Integer;
 begin
-  Id := Self.GetId;
-  Line := ItemCache.GetStrings(Id);
+  _Id := Self.GetId;
+  Line := ItemCache.GetStrings(_Id);
   Temp := Between('''actions'': [''', ']', Line);
   Temp := Copy(Temp, 1, Length(Temp) - 1);
   Result := Explode(''',''',Temp);
@@ -66,10 +55,10 @@ end;
 function TReflectGroundItem.GetGroundActions: TStringArray;
 var
   Line, Temp: string;
-  Id: Integer;
+  _Id: Integer;
 begin
-  Id := Self.GetId;
-  Line := ItemCache.GetStrings(Id);
+  _Id := Self.GetId;
+  Line := ItemCache.GetStrings(_Id);
   Temp := Between('''groundActions'': [''', ']', Line);
   Temp := Copy(Temp, 1, Length(Temp) - 1);
   Result := Explode(''',''',Temp);
@@ -78,16 +67,16 @@ end;
 function TReflectGroundItem.GetHighAlchValue: Integer;
 var
   Line: string;
-  Id: Integer;
+  _Id: Integer;
 begin
-  Id := Self.GetId;
-  Line := ItemCache.GetStrings(Id);
+  _Id := Self.GetId;
+  Line := ItemCache.GetStrings(_Id);
   Result := StrToInt(Between('highAlchValue'': ', '}', Line));
 end;
 
 function TReflectGroundItem.GetTile: TTile;
 begin
-  Result := Self.Tile;
+  Result := Self._Tile;
 end;
 
 function TReflectGroundItem.GetMSPoint: TPoint;
@@ -96,14 +85,14 @@ begin
 end;
 
 {$IFNDEF CODEINSIGHT}
-procedure TReflectGroundItemArray._GetAt(Tile: TPoint; BaseX, BaseY,
+procedure TReflectGroundItemArray._GetAt(_Tile: TPoint; BaseX, BaseY,
   Plane: Integer);
 var
-  Id, Quantity, Iteration, Start, I: Integer;
+  _Id, Quantity, Iteration, Start, I: Integer;
   Temp: TReflectGroundItemArray;
 begin
   Reflect.Mem.Get3DObject(ckNull, ckGroundArray, Client_GroundItems, 0, 0,
-    Plane, Tile.X, Tile.Y);
+    Plane, _Tile.X, _Tile.Y);
   if HookCache[ckGroundArray][0] < 1 then
     Exit;
   for I := 0 to 999 do
@@ -119,13 +108,13 @@ begin
     (HookCache[ckGroundList][Start + Iteration] <>
     HookCache[ckGroundList][Start + Iteration + 1]) do
   begin
-    Id := Reflect.Smart.GetFieldInt(
+    _Id := Reflect.Smart.GetFieldInt(
       HookCache[ckGroundList][Start + Iteration + 1], Item_Id);
-    if (Id < 0) or (Id > 10000) then
+    if (_Id < 0) or (_Id > 10000) then
       Break;
-    Temp[Iteration].Id := Id;
-    Temp[Iteration].Tile.X := Tile.X + BaseX;
-    Temp[Iteration].Tile.Y := Tile.Y + BaseY;
+    Temp[Iteration]._Id := _Id;
+    Temp[Iteration]._Tile.X := _Tile.X + BaseX;
+    Temp[Iteration]._Tile.Y := _Tile.Y + BaseY;
     Temp[Iteration].Reference :=
       HookCache[ckGroundList][Start + Iteration + 1];
     Reflect.Mem.GetObject(
@@ -144,10 +133,10 @@ var
    Position: TTile;
 begin
   Reflect.Mem.FreeObjects(ckGroundList, False);
-  Position := Reflect.Internals.GetGlobalTile;
+  Position := Reflect.Tiles.GetGlobalTile;
   Distance := Round(Distance / 2);
-  BaseX := Reflect.Internals.BaseX;
-  BaseY := Reflect.Internals.BaseY;
+  BaseX := Reflect.Misc.BaseX;
+  BaseY := Reflect.Misc.BaseY;
   Position := Point(Position.X - BaseX, Position.Y - BaseY);
   Plane := Reflect.Tiles.GetPlane;
   HighX := Position.X + Distance;
@@ -181,8 +170,8 @@ var
   BaseX, BaseY, Plane: Integer;
 begin
   Reflect.Mem.FreeObjects(ckGroundList, False);
-  BaseX := Reflect.Internals.BaseX;
-  BaseY := Reflect.Internals.BaseY;
+  BaseX := Reflect.Misc.BaseX;
+  BaseY := Reflect.Misc.BaseY;
   Plane := Reflect.Tiles.GetPlane;
   Self._GetAt(
     Point(RealTile.X - BaseX, RealTile.Y - BaseY), BaseX, BaseY, Plane);
@@ -193,7 +182,7 @@ end;
 procedure TReflectGroundItemArray.Get(Name: string; Distance: Integer = 103);
 var
   Temp, Temp1: TReflectGroundItemArray;
-  I, H, T: integer;
+  I, H, T: Integer;
 begin
   Temp.GetAll(Distance);
   if Length(Temp) = 0 then
@@ -214,7 +203,7 @@ begin
 end;
 
 procedure TReflectGroundItemArray.Get(
-  Id: Integer; Distance: Integer = 103); overload;
+  _Id: Integer; Distance: Integer = 103); overload;
 var
   Temp, Temp1: TReflectGroundItemArray;
   I, H, T: integer;
@@ -226,7 +215,7 @@ begin
   SetLength(Temp1, H + 1);
   for I := 0 to H do
   begin
-    if (Temp[I].GetId = Id) then
+    if (Temp[I].GetId = _Id) then
     begin
       Temp1[T] := Temp[I];
       Inc(T);
@@ -253,11 +242,11 @@ begin
 end;
 
 function TReflectGroundItem.Find(
-  Id: Integer; Distance: Integer = 103): Boolean; overload;
+  _Id: Integer; Distance: Integer = 103): Boolean; overload;
 var
   Temp: TReflectGroundItemArray;
 begin
-  Temp.Get(Id, Distance);
+  Temp.Get(_Id, Distance);
   if Length(Temp) = 0 then
     Exit;
   Temp.Sort;
@@ -267,4 +256,3 @@ begin
     Self := Temp[0];
   end;
 end;
-
