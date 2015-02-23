@@ -2,59 +2,14 @@
 type
   TReflectObject = record(TReflectPointer)
 {$IFNDEF CODEINSIGHT}
-    ObjType: TObjectType;
     Id: Integer;
+    ObjType: TObjectType;
     Name: string;
     Tile: TTile;
 {$ENDIF}
 end;
 
   TReflectObjectArray = array of TReflectObject;
-
-procedure TReflectObjectArray.Init(_ObjType: TObjectType; _Id: Integer);
-begin
-  if Length(Self) = 0 then
-    SetLength(Self, 1);
-  Self[0].ObjType := _ObjType;
-  Self[0].Id := _Id;
-end;
-
-procedure TReflectObjectArray.Init(_ObjType: TObjectType; _Name: string);
-  overload;
-begin
-  if Length(Self) = 0 then
-    SetLength(Self, 1);
-  Self[0].ObjType := _ObjType;
-  Self[0].Name := _Name;
-end;
-
-procedure TReflectObjectArray.Init(_ObjType: TObjectType); overload;
-begin
-  if Length(Self) = 0 then
-    SetLength(Self, 1);
-  Self[0].ObjType := _ObjType;
-  Self[0].Id := 0;
-  Self[0].Name := '';
-end;
-
-procedure TReflectObject.Init(_ObjType: TObjectType; _Id: Integer);
-begin
-  Self.ObjType := _ObjType;
-  Self.Id := _Id;
-end;
-
-procedure TReflectObject.Init(_ObjType: TObjectType; _Name: string); overload;
-begin
-  Self.ObjType := _ObjType;
-  Self.Name := _Name;
-end;
-
-procedure TReflectObject.Init(_ObjType: TObjectType); overload;
-begin
-  Self.ObjType := _ObjType;
-  Self.Id := 0;
-  Self.Name := '';
-end;
 
 {*Credit Widget, Modified by Lordsaturn*}
 procedure TReflectObjectArray.Sort;
@@ -170,7 +125,7 @@ begin
 end;
 
 {$IFNDEF CODEINSIGHT}
-procedure TReflectObject.GetObject(Iteration: Integer; _Tile: TTile);
+procedure TReflectObject._GetObject(Iteration: Integer; _Tile: TTile);
 var
   Id: Integer;
   Temp: TReflectObject;
@@ -190,8 +145,8 @@ begin
     Self.Tile := _Tile;
   end;
 end;
-
-procedure TReflectObjectArray.GetAll(Distance: Integer);
+{$ENDIF}
+procedure TReflectObjectArray.GetAll(ObjType: TObjectType; Distance: Integer);
 var
   Multi, BaseX, BaseY, X, Y, I, Count, Plane, HighX, HighY: integer;
   Temp: TReflectObject;
@@ -218,10 +173,10 @@ begin
   for X := Position.X - Distance to HighX do
     for Y := Position.Y - Distance to HighY do
     begin
-      Temp.ObjType := Self[0].ObjType;
       Reflect.Mem.Get3DObject(ckRegion, ckSceneTile, Region_SceneTiles,
         Count, 0, Plane, X, Y);
-      Temp.GetObject(Count, Point(BaseX + X, BaseY + Y));
+      Temp.ObjType := ObjType;
+      Temp._GetObject(Count, Point(BaseX + X, BaseY + Y));
       Inc(Count);
       if Temp.Reference = 0 then
         Continue;
@@ -232,9 +187,8 @@ begin
     Reflect.Mem.FreeObjects(ckSceneTile, Count);
     Self.Sort;
 end;
-{$ENDIF}
 
-procedure TReflectObject.GetAt(_Tile: TTile);
+procedure TReflectObject.GetAt(ObjType: TObjectType; _Tile: TTile);
 var
   ObjectHook, SceneHook: THook;
   Multi, BaseX, BaseY, Plane: Integer;
@@ -249,58 +203,28 @@ begin
     Reflect.Mem.GetObject(ckNull, ckRegion, Client_Region, 0, 0);
   Reflect.Mem.Get3DObject(ckRegion, ckSceneTile, Region_SceneTiles, 0, 0, Plane,
     _Tile.X - BaseX, _Tile.Y - BaseY);
-  Self.GetObject(0, _Tile);
+  Self.ObjType := ObjType;
+  Self._GetObject(0, _Tile);
   Reflect.Mem.FreeObjects(ckSceneTile, False);
 end;
 
-procedure TReflectObjectArray.Get(Distance: Integer = 103);
+procedure TReflectObjectArray.Get(
+  ObjType: TObjectType; Name: string; Distance: Integer = 103);
 var
   Temp, Temp1: TReflectObjectArray;
   I, H, T: integer;
 begin
-  if Length(Self) = 0 then
-  begin
-    Reflect.Logger.Warn('TReflectObjectArray is not initialized @.Get');
-    Exit;
-  end;
-  if (Self[0].Id = 0) and (Self[0].Name = '')then
-  begin
-    Self.GetAll(Distance);
-    Exit;
-  end;
-  Temp := Self;
-  Temp.GetAll(Distance);
+  Temp.GetAll(ObjType, Distance);
   if Length(Temp) = 0 then
     Exit;
-  if Self[0].Id = 0 then
+  H := High(Temp);
+  SetLength(Temp1, H + 1);
+  for I := 0 to H do
   begin
-    if Self[0].ObjType.Index <> ObjGame.Index then
+    if (Temp[I].GetName = Name) then
     begin
-      Reflect.Logger.Warn('Only ObjGame can be searched by name @.Get');
-      Exit;
-    end;
-    H := High(Temp);
-    SetLength(Temp1, H + 1);
-    for I := 0 to H do
-    begin
-      if (Temp[I].GetName = Self[0].Name) then
-      begin
-        Temp1[T] := Temp[I];
-        Inc(T);
-      end;
-    end;
-  end
-  else
-  begin
-    H := High(Temp);
-    Setlength(Temp1, H + 1);
-    for I := 0 to H do
-    begin
-      if (Temp[I].GetId = Self[0].Id) then
-      begin
-        Temp1[T] := Temp[I];
-        Inc(T);
-      end;
+      Temp1[T] := Temp[I];
+      Inc(T);
     end;
   end;
   Setlength(Temp1, T);
@@ -308,27 +232,52 @@ begin
   Self.Sort;
 end;
 
-function TReflectObject.Find(Distance: Integer = 103): Boolean;
+procedure TReflectObjectArray.Get(
+  ObjType: TObjectType; Id: Integer; Distance: Integer = 103); overload;
+var
+  Temp, Temp1: TReflectObjectArray;
+  I, H, T: integer;
+begin
+  Temp.GetAll(ObjType, Distance);
+  if Length(Temp) = 0 then
+    Exit;
+  H := High(Temp);
+  SetLength(Temp1, H + 1);
+  for I := 0 to H do
+  begin
+    if (Temp[I].GetId = Id) then
+    begin
+      Temp1[T] := Temp[I];
+      Inc(T);
+    end;
+  end;
+  Setlength(Temp1, T);
+  Self := Temp1;
+  Self.Sort;
+end;
+
+function TReflectObject.Find(
+  ObjType: TObjectType; Name: string; Distance: Integer = 103): Boolean;
 var
   Temp: TReflectObjectArray;
 begin
-  if (Self.Name = '') and (Self.Id = 0) then
-  begin
-    Reflect.Logger.Warn('TReflectObject is not initialized @ .Find');
+  Temp.Get(ObjType, Name, Distance);
+  if Length(Temp) = 0 then
     Exit;
-  end;
-  if Self.Name = '' then
-    Temp.Init(Self.ObjType, Self.Id);
-  if Self.Id = 0 then
+  Temp.Sort;
+  if Reflect.Tiles.NearTile(Temp[0].GetTile, Distance) then
   begin
-    if Self.ObjType.Index <> ObjGame.Index then
-    begin
-      Reflect.Logger.Warn('Only ObjGame can be searched by name @.Find');
-      Exit(False);
-    end;
-    Temp.Init(Self.ObjType, Self.Name);
+    Result := True;
+    Self := Temp[0];
   end;
-  Temp.Get(Distance);
+end;
+
+function TReflectObject.Find(
+  ObjType: TObjectType; Id: Integer; Distance: Integer = 103): Boolean; overload;
+var
+  Temp: TReflectObjectArray;
+begin
+  Temp.Get(ObjType, Id, Distance);
   if Length(Temp) = 0 then
     Exit;
   Temp.Sort;

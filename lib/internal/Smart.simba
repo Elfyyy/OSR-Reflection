@@ -1,7 +1,5 @@
+
 type
-  TReflectPointer = record
-    Reference: Integer;
-  end;
   PReflectionSmart = ^TReflectionSmart;
 
 var

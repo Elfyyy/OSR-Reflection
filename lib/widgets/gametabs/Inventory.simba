@@ -9,45 +9,6 @@ type
 
   TReflectInvItemArray = array of TReflectInvItem;
 
-procedure TReflectInvItemArray.Init(_Id: Integer);
-begin
-  if Length(Self) = 0 then
-    SetLength(Self, 1);
-  Self[0].Id := _Id;
-end;
-
-procedure TReflectInvItemArray.Init(_Name: string);
-  overload;
-begin
-  if Length(Self) = 0 then
-    SetLength(Self, 1);
-  Self[0].Name := _Name;
-end;
-
-procedure TReflectInvItemArray.Init; overload;
-begin
-  if Length(Self) = 0 then
-    SetLength(Self, 1);
-  Self[0].Id := 0;
-  Self[0].Name := '';
-end;
-
-procedure TReflectInvItem.Init(_Id: Integer);
-begin
-  Self.Id := _Id;
-end;
-
-procedure TReflectInvItem.Init(_Name: string); overload;
-begin
-  Self.Name := _Name;
-end;
-
-procedure TReflectInvItem.Init; overload;
-begin
-  Self.Id := 0;
-  Self.Name := '';
-end;
-
 function TReflectInvItem.GetName: string;
 var
   Line: string;
@@ -103,7 +64,11 @@ begin
   Result := Self.Id;
 end;
 
-{$IFNDEF CODEINSIGHT}
+function TReflectInvItem.GetInvSlot: Integer;
+begin
+  Result := Self.InvSlot;
+end;
+
 procedure TReflectInvItemArray.GetAll;
 var
   I, TheId, TheQuantity, Count: Integer;
@@ -129,76 +94,71 @@ begin
     end;
   end;
 end;
-{$ENDIF}
 
-procedure TReflectInvItemArray.Get;
+procedure TReflectInvItemArray.Get(Name: string);
 var
   Temp, Temp1: TReflectInvItemArray;
   I, H, T: integer;
 begin
-  if Length(Self) = 0 then
-  begin
-    Reflect.Logger.Warn('TReflectInvItemArray is not initialized @.Get');
-    Exit;
-  end;
-  if (Self[0].Id = 0) and (Self[0].Name = '')then
-  begin
-    Self.GetAll;
-    Exit;
-  end;
-  Temp := Self;
   Temp.GetAll;
   if Length(Temp) = 0 then
     Exit;
-  if Self[0].Id = 0 then
+  H := High(Temp);
+  SetLength(Temp1, H + 1);
+  for I := 0 to H do
   begin
-    H := High(Temp);
-    SetLength(Temp1, H + 1);
-    for I := 0 to H do
+    if (Temp[I].GetName = Name) then
     begin
-      if (Temp[I].GetName = Self[0].Name) then
-      begin
-        Temp1[T] := Temp[I];
-        Inc(T);
-      end;
-    end;
-  end
-  else
-  begin
-    H := High(Temp);
-    Setlength(Temp1, H + 1);
-    for I := 0 to H do
-    begin
-      if (Temp[I].GetId = Self[0].Id) then
-      begin
-        Temp1[T] := Temp[I];
-        Inc(T);
-      end;
+      Temp1[T] := Temp[I];
+      Inc(T);
     end;
   end;
   Setlength(Temp1, T);
   Self := Temp1;
 end;
 
-function TReflectInvItem.Find: Boolean;
+procedure TReflectInvItemArray.Get(Id: Integer); overload;
+var
+  Temp, Temp1: TReflectInvItemArray;
+  I, H, T: Integer;
+begin
+  Temp.GetAll;
+  if Length(Temp) = 0 then
+    Exit;
+  H := High(Temp);
+  SetLength(Temp1, H + 1);
+  for I := 0 to H do
+  begin
+    if (Temp[I].GetId = Id) then
+    begin
+      Temp1[T] := Temp[I];
+      Inc(T);
+    end;
+  end;
+  Setlength(Temp1, T);
+  Self := Temp1;
+end;
+
+function TReflectInvItem.Find(Name: string): Boolean;
 var
   Temp: TReflectInvItemArray;
 begin
-  if (Self.Name = '') and (Self.Id = 0) then
-  begin
-    Reflect.Logger.Warn('TReflectInvItem is not initialized @ .Find');
+  Temp.Get(Name);
+  if Length(Temp) = 0 then
     Exit;
-  end;
-  if Self.Name = '' then
-    Temp.Init(Self.Id);
-  if Self.Id = 0 then
-    Temp.Init(Self.Name);
-  Temp.Get;
-  if Length(Temp) > 0 then
-  begin
-    Result := True;
-    Self := Temp[0];
-  end;
+  Result := True;
+  Self := Temp[0];
+end;
+
+function TReflectInvItem.Find(Id: Integer): Boolean; overload;
+var
+  Temp: TReflectInvItemArray;
+begin
+  Temp.Get(Id);
+  if Length(Temp) = 0 then
+    Exit;
+  Result := True;
+  Self := Temp[0];
 end;
 
 function TReflectInvItem.GetMainScreenPoint: TPoint;
@@ -244,8 +204,7 @@ var
 begin
   for I := 0 to High(TheItem) do
   begin
-    _Item.Init(TheItem[I]);
-    if _Item.Find then
+    if _Item.Find(TheItem[I]) then
       Exit(True);
   end;
 end;
@@ -258,8 +217,7 @@ var
 begin
   for I := 0 to High(TheItem) do
   begin
-    _Item.Init(TheItem[I]);
-    if _Item.Find then
+    if _Item.Find(TheItem[I]) then
       Exit(True);
   end;
 end;
@@ -268,8 +226,7 @@ function TReflectionInventory.Drop(Item: Integer): Boolean;
 var
   Temp: TReflectInvItem;
 begin
-  Temp.Init(Item);
-  if Temp.Find then
+  if Temp.Find(Item) then
   begin
     Reflect.Mouse.Move(Temp.GetMainScreenPoint, 2, 2);
     Wait(RandomRange(160, 250));
@@ -282,8 +239,7 @@ function TReflectionInventory.Drop(Item: string): Boolean; overload;
 var
   Temp: TReflectInvItem;
 begin
-  Temp.Init(Item);
-  if Temp.Find then
+  if Temp.Find(Item) then
   begin
     Reflect.Mouse.Move(Temp.GetMainScreenPoint, 2, 2);
     Wait(RandomRange(160, 250));

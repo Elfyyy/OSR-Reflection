@@ -95,6 +95,30 @@ var
   ObjectCache, NpcCache, ItemCache: TStringList;
   ObjGame, ObjWallDecoration, ObjFloorDecoration, ObjBoundary: TObjectType;
 
+type
+  TReflectPointer = record
+    Reference: Integer;
+  end;
+
+  {Object Records}
+
+    {Actor}
+type
+  TReflectActor = type(TReflectPointer);
+
+    {Npcs}
+type
+  TReflectNPC = record(TReflectActor)
+{$IFNDEF CODEINSIGHT}
+    _DefReference: Integer;
+    _Ids: TIntegerArray;
+    _Names: TStringArray;
+    _Tile: TTile;
+{$ENDIF}
+end;
+
+  TReflectNPCArray = array of TReflectNPC;
+
   {Constants}
 
 const
