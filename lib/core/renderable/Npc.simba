@@ -27,7 +27,7 @@ begin
   SetArrayLength(Temp, L);
   for I := 0 to L - 1 do
     Tpa[I] := Self[I]._Tile;
-  SortTPAFrom(Tpa, Reflect.Internals.GetGlobalTile);
+  SortTPAFrom(Tpa, Reflect.Tiles.GetGlobalTile);
   for I := 0 to L - 1 do
     for C := 0 to L - 1 do
       if (Tpa[I].Y = Self[C]._Tile.Y) and (Tpa[I].X = Self[C]._Tile.X) then

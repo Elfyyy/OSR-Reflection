@@ -1,38 +1,4 @@
 
-type
-  TReflectWornEquipment = record(TReflectPointer)
-    EquipSlot, Id: Integer;
-    Name: string;
-  end;
-
-  TReflectWornEquipmentArray = Array of TReflectWornEquipment;
-
-procedure TReflectWornEquipmentArray.Init(_Name: string);
-  overload;
-begin
-  if Length(Self) = 0 then
-    SetLength(Self, 1);
-  Self[0].Name := _Name;
-end;
-
-procedure TReflectWornEquipmentArray.Init; overload;
-begin
-  if Length(Self) = 0 then
-    SetLength(Self, 1);
-  Self[0].Id := 0;
-  Self[0].Name := '';
-end;
-
-procedure TReflectWornEquipment.Init(_Id: Integer);
-begin
-  Self.Id := _Id;
-end;
-
-procedure TReflectWornEquipment.Init(_Name: string); overload;
-begin
-  Self.Name := _Name;
-end;
-
 procedure TReflectWornEquipmentArray.GetAll;
 var
   EquipmentWidget, EquipmentChild: TReflectWidget;

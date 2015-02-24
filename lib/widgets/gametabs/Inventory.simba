@@ -1,20 +1,10 @@
 
-type
-  TReflectInvItem = record(TReflectPointer)
-{$IFNDEF CODEINSIGHT}
-    InvSlot, Id: Integer;
-    Name: string;
-{$ENDIF}
-  end;
-
-  TReflectInvItemArray = array of TReflectInvItem;
-
 function TReflectInvItem.GetName: string;
 var
   Line: string;
   Id: Integer;
 begin
-  Id := Self.Id;
+  Id := Self._Id;
   Line := ItemCache.GetStrings(Id);
   Result := Between('''name'': ''', ''',', Line);
 end;
@@ -24,7 +14,7 @@ var
   Line, Temp: string;
   Id: Integer;
 begin
-  Id := Self.Id;
+  Id := Self._Id;
   Line := ItemCache.GetStrings(Id);
   Temp := Between('''actions'': [''', ']', Line);
   Temp := Copy(Temp, 1, Length(Temp) - 1);
@@ -36,7 +26,7 @@ var
   Line, Temp: string;
   Id: Integer;
 begin
-  Id := Self.Id;
+  Id := Self._Id;
   Line := ItemCache.GetStrings(Id);
   Temp := Between('''groundActions'': [''', ']', Line);
   Temp := Copy(Temp, 1, Length(Temp) - 1);
@@ -48,7 +38,7 @@ var
   Line: string;
   Id: Integer;
 begin
-  Id := Self.Id;
+  Id := Self._Id;
   Line := ItemCache.GetStrings(Id);
   Result := StrToInt(Between('highAlchValue'': ', '}', Line));
 end;
@@ -56,17 +46,17 @@ end;
 function TReflectInvItem.GetQuantity: Integer;
 begin
   Result := Reflect.Smart.GetFieldArrayInt(Self.Reference,
-        Widget_StackSizes, Self.InvSlot - 1);
+        Widget_StackSizes, Self._InvSlot - 1);
 end;
 
 function TReflectInvItem.GetId: Integer;
 begin
-  Result := Self.Id;
+  Result := Self._Id;
 end;
 
 function TReflectInvItem.GetInvSlot: Integer;
 begin
-  Result := Self.InvSlot;
+  Result := Self._InvSlot;
 end;
 
 procedure TReflectInvItemArray.GetAll;
@@ -88,8 +78,8 @@ begin
       with Self[Count - 1] do
       begin
         Reference := InvWidget.Reference;
-        Id := TheId - 1;
-        InvSlot := I + 1;
+        _Id := TheId - 1;
+        _InvSlot := I + 1;
       end;
     end;
   end;
@@ -166,12 +156,12 @@ var
   Slot1, Slot6, Temp: TBox;
   Pnt: TPoint;
 begin
-  if not InRange(Self.InvSlot, 1, 28) then
+  if not InRange(Self._InvSlot, 1, 28) then
     Exit;
   Slot1 := [563, 213, 594, 244];
   Slot6 := [605, 249, 31415, 92653];
-  Temp.X1 := Slot1.X1 + ((((Self.InvSlot + 3) mod 4)) * (Slot6.X1 - Slot1.X1));
-  Temp.Y1 := Slot1.Y1 + ((((Self.InvSlot - 1) div 4)) * (Slot6.Y1 - Slot1.Y1));
+  Temp.X1 := Slot1.X1 + ((((Self._InvSlot + 3) mod 4)) * (Slot6.X1 - Slot1.X1));
+  Temp.Y1 := Slot1.Y1 + ((((Self._InvSlot - 1) div 4)) * (Slot6.Y1 - Slot1.Y1));
   Temp.X2 := Temp.X1 + (Slot1.X2 - Slot1.X1);
   Temp.Y2 := Temp.Y1 + (Slot1.Y2 - Slot1.Y1);
   Reflect.Math.GaussBox(Pnt.X, Pnt.Y, Temp.X1, Temp.Y1, Temp.X2, Temp.Y2);
@@ -256,16 +246,11 @@ begin
   Temp.GetAll;
   ItemCount := Length(Temp);
   for I := 0 to ItemCount do
-    Self.Drop(Temp[I].Id);
+    Self.Drop(Temp[I]._Id);
 end;
 
 function TReflectInvItem.Drop: Boolean;
 begin
-  if (Self.Name = '') and (Self.Id = 0) then
-  begin
-    Reflect.Logger.Warn('TReflectInvItem is not initialized @ .Drop');
-    Exit;
-  end;
   Reflect.Mouse.Move(Self.GetMainScreenPoint, 2, 2);
   Wait(RandomRange(160, 250));
   Reflect.Mouse.Click(Mouse_Right);
@@ -276,14 +261,9 @@ procedure TReflectInvItemArray.Drop;
 var
   ItemCount, I: Integer;
 begin
-  if Length(Self) = 0 then
-  begin
-    Reflect.Logger.Warn('TReflectInvItemArray is not initialized @ .Drop');
-    Exit;
-  end;
   ItemCount := Length(Self);
   for I := 0 to ItemCount do
-    Reflect.Inv.Drop(Self[I].Id);
+    Reflect.Inv.Drop(Self[I]._Id);
 end;
 
 
