@@ -301,6 +301,7 @@ begin
   ObjWallDecoration.LocalY := WallDecoration_LocalY;
   ObjWallDecoration.RelativeX := WallDecoration_RelativeX;
   ObjWallDecoration.RelativeY := WallDecoration_RelativeY;
+  ObjWallDecoration.SceneObject := SceneTile_WallDecoration;
   ObjFloorDecoration.Index := 3;
   ObjFloorDecoration.Id := WallDecoration_Id;
   ObjFloorDecoration.Flags := FloorDecoration_Flags;
@@ -308,6 +309,7 @@ begin
   ObjFloorDecoration.Render := FloorDecoration_Render;
   ObjFloorDecoration.LocalX := FloorDecoration_LocalX;
   ObjFloorDecoration.LocalY := FloorDecoration_LocalY;
+  ObjFloorDecoration.SceneObject := SceneTile_GroundDecoration;
   ObjBoundary.Index := 4;
   ObjBoundary.Id := BoundaryObject_Id;
   ObjBoundary.Flags := BoundaryObject_Flags;
@@ -317,6 +319,7 @@ begin
   ObjBoundary.Orientation := BoundaryObject_Orientation;
   ObjBoundary.LocalX := BoundaryObject_LocalX;
   ObjBoundary.LocalY := BoundaryObject_LocalY;
+  ObjBoundary.SceneObject := SceneTile_BoundaryObject;
 end;
 
 

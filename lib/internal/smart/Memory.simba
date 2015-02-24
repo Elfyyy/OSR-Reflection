@@ -145,13 +145,13 @@ end;
 begin
   ObjectCache.Init;
   ObjectCache.LoadFromFile(
-    IncludePath + 'reflection\lib\internal\ObjectDefs.txt');
+    IncludePath + 'reflectiondev\lib\internal\definitions\ObjectDefs.txt');
   NpcCache.Init;
   NpcCache.LoadFromFile(
-    IncludePath + 'reflection\lib\internal\NpcDefs.txt');
+    IncludePath + 'reflectiondev\lib\internal\definitions\NpcDefs.txt');
   ItemCache.Init;
   ItemCache.LoadFromFile(
-    IncludePath + 'reflection\lib\internal\ItemDefs.txt');
+    IncludePath + 'reflectiondev\lib\internal\definitions\ItemDefs.txt');
   AddOnTerminate('ReflectFree');
   SetLength(HookCache, 13);
   SetLength(HookCache[ckNull], 10817);
