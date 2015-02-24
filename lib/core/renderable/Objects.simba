@@ -12,11 +12,11 @@ begin
   SetArrayLength(Tpa, L);
   SetArrayLength(Temp, L);
   for I := 0 to L - 1 do
-    Tpa[I] := Self[I].Tile;
+    Tpa[I] := Self[I]._Tile;
   SortTPAFrom(Tpa, Reflect.Tiles.GetGlobalTile);
   for I := 0 to L - 1 do
     for C := 0 to L - 1 do
-      if (Tpa[I].Y = Self[C].Tile.Y) and (Tpa[I].X = Self[C].Tile.X) then
+      if (Tpa[I].Y = Self[C]._Tile.Y) and (Tpa[I].X = Self[C]._Tile.X) then
         Temp[I] := Self[C];
   Self := Temp;
 end;
@@ -26,8 +26,8 @@ var
   LocalTile: TTile;
 begin
   LocalTile := Point(Reflect.Smart.GetFieldInt(
-    Self.Reference, Self.ObjType.LocalX), Reflect.Smart.GetFieldInt(
-    Self.Reference, Self.ObjType.LocalY));
+    Self.Reference, Self._ObjType.LocalX), Reflect.Smart.GetFieldInt(
+    Self.Reference, Self._ObjType.LocalY));
   Result := Point(LocalTile.X + Reflect.Misc.BaseX, LocalTile.Y +
     Reflect.Misc.BaseY);
 end;
@@ -36,26 +36,26 @@ function TReflectObject.GetOffset: TTile;
 var
   LocalTile: TTile;
 begin
-  if Self.ObjType.Index <> ObjGame.Index then
+  if Self._ObjType.Index <> ObjGame.Index then
   begin
     Reflect.Logger.Warn('Only ObjGame has an Offset @.GetOffset');
     Exit(Point(-1, -1));
   end;
   LocalTile := Point(Reflect.Smart.GetFieldInt(
-    Self.Reference, Self.ObjType.OffsetX), Reflect.Smart.GetFieldInt(
-    Self.Reference, Self.ObjType.OffsetY));
+    Self.Reference, Self._ObjType.OffsetX), Reflect.Smart.GetFieldInt(
+    Self.Reference, Self._ObjType.OffsetY));
   Result := Point(LocalTile.X + Reflect.Misc.BaseX, LocalTile.Y +
     Reflect.Misc.BaseY);
 end;
 
 function TReflectObject.GetOrientation: Integer;
 begin
-  Result := Reflect.Smart.GetFieldInt(Self.Reference, Self.ObjType.Orientation);
+  Result := Reflect.Smart.GetFieldInt(Self.Reference, Self._ObjType.Orientation);
 end;
 
 function TReflectObject.GetId: Integer;
 begin
-  Result := Reflect.Smart.GetFieldInt(Self.Reference, Self.ObjType.Id);
+  Result := Reflect.Smart.GetFieldInt(Self.Reference, Self._ObjType.Id);
   Result := (Result shr 14) and $7fff;
 end;
 
@@ -97,7 +97,7 @@ var
   OffsetX, OffsetY, XShift, YShift: Extended;
   Tile: TPoint;
 begin
-  if Self.ObjType.Index <> ObjGame.Index then
+  if Self._ObjType.Index <> ObjGame.Index then
     Exit(Self.GetTile);
   Tile := Self.GetTile;
   OffsetX := (Tile.X + Self.GetOffset.X) / 2;
@@ -118,19 +118,19 @@ var
   Id: Integer;
   Temp: TReflectObject;
 begin
-  if (Self.ObjType.Index <> ObjGame.Index) then
+  if (Self._ObjType.Index <> ObjGame.Index) then
   begin
-    Reflect.Mem.GetObject(ckSceneTile, ckObject, Self.ObjType.SceneObject,
+    Reflect.Mem.GetObject(ckSceneTile, ckObject, Self._ObjType.SceneObject,
       Iteration, Iteration);
     Self.Reference := HookCache[ckObject][Iteration];
-    Self.Tile := _Tile;
+    Self._Tile := _Tile;
   end
   else
   begin
     Reflect.Mem.GetObjectArray(ckSceneTile, ckObject,
-      Self.ObjType.SceneObject, Iteration, Iteration, 0);
+      Self._ObjType.SceneObject, Iteration, Iteration, 0);
     Self.Reference := HookCache[ckObject][Iteration];
-    Self.Tile := _Tile;
+    Self._Tile := _Tile;
   end;
 end;
 {$ENDIF}
@@ -163,7 +163,7 @@ begin
     begin
       Reflect.Mem.Get3DObject(ckRegion, ckSceneTile, Region_SceneTiles,
         Count, 0, Plane, X, Y);
-      Temp.ObjType := ObjType;
+      Temp._ObjType := ObjType;
       Temp._GetObject(Count, Point(BaseX + X, BaseY + Y));
       Inc(Count);
       if Temp.Reference = 0 then
@@ -191,7 +191,7 @@ begin
     Reflect.Mem.GetObject(ckNull, ckRegion, Client_Region, 0, 0);
   Reflect.Mem.Get3DObject(ckRegion, ckSceneTile, Region_SceneTiles, 0, 0, Plane,
     _Tile.X - BaseX, _Tile.Y - BaseY);
-  Self.ObjType := ObjType;
+  Self._ObjType := ObjType;
   Self._GetObject(0, _Tile);
   Reflect.Mem.FreeObjects(ckSceneTile, False);
 end;

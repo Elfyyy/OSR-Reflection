@@ -111,8 +111,6 @@ type
   TReflectNPC = record(TReflectActor)
 {$IFNDEF CODEINSIGHT}
     _DefReference: Integer;
-    _Ids: TIntegerArray;
-    _Names: TStringArray;
     _Tile: TTile;
 {$ENDIF}
 end;
@@ -123,7 +121,7 @@ type
   TReflectGroundItem = record(TReflectPointer)
 {$IFNDEF CODEINSIGHT}
     _Id: Integer;
-    Name: string;
+    _Name: string;
     _Tile: TTile;
 {$ENDIF}
   end;
@@ -140,10 +138,10 @@ type
   type
     TReflectObject = record(TReflectPointer)
 {$IFNDEF CODEINSIGHT}
-      Id: Integer;
-      ObjType: TObjectType;
-      Name: string;
-      Tile: TTile;
+      _Id: Integer;
+      _ObjType: TObjectType;
+      _Name: string;
+      _Tile: TTile;
 {$ENDIF}
   end;
   TReflectObjectArray = array of TReflectObject;
@@ -163,16 +161,6 @@ type
       StartTime, TotalRan: Int64;
       IsRunning: Boolean;
   end;
-
-      {Item}
-  type
-    TReflectItem = record
-{$IFNDEF CODEINSIGHT}
-      Name: string;
-      Id, HighAlchValue: Integer;
-      InvActions, GroundActions: TStringArray;
-{$ENDIF}
-    end;
 
       {Bank}
   type
