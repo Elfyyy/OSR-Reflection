@@ -70,7 +70,7 @@ begin
     Exit;
   Loc := Reflect.Tiles.GetGlobalTile;
   Result :=  Distance(Tile.X, Tile.Y, Loc.X, Loc.Y);
-end;  
+end;
 
 function TReflectionTiles.NearTile(Tile: TTile; Dist: Integer): Boolean;
 begin
@@ -222,4 +222,24 @@ begin
     0, Client_BaseY) + 0.5) * 128) + YOffset;
   Z := Reflect.Tiles.GetTileHeight(Tile) + ZOffset;
   Result := Reflect.Internals.TileToMS(X, Y, Z);
+end;
+
+{* Credit Fitta *}
+function TReflectionTiles.TileOnMS(Tile: TPoint): Boolean;
+begin
+  Result := PointInBox(Reflect.Tiles.TileToMS(Tile), IntToBox(MSX1, MSY1, MSX2, MSY2));
+end;
+
+{* Credit flamingo1 *}
+function TReflectionTiles.TileRandom(Tile: TPoint; aFrom, aTo: Integer): TPoint;
+begin
+  Tile.X := Tile.X + RandomRange(aFrom, aTo);
+  Tile.Y := Tile.Y + RandomRange(aFrom, aTo);
+
+  Result := Tile;
+end;
+
+function TReflectionTiles.TileRandom(Tile: TPoint): TPoint; overload;
+begin
+  Result := TReflectionTiles.TileRandom(Tile, -1, 1);
 end;
