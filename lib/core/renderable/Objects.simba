@@ -341,7 +341,7 @@ begin
 end;
 
 {* Credit SRLTheMayor, modified by flamingo1 *}
-function TReflectObject.WalkTo: Boolean; overload;
+function TReflectObject.WalkTo: Boolean;
 begin
   Result := TReflectLocalPlayer.WalkToTileMM(Self.GetTile);
 end;
@@ -356,7 +356,7 @@ begin
 end;
 
 {* Credit flamingo1 *}
-function TReflectObject.Hover(RanX, RanY: Integer): Boolean; overload;
+function TReflectObject.Hover(RanX, RanY: Integer = 0): Boolean;
 begin
   if (not Self.IsOnMS) then
     Exit;
@@ -364,12 +364,7 @@ begin
   Reflect.Mouse.Move(Self.GetMSPoint, RanX, RanY);
 end;
 
-function TReflectObject.Hover: Boolean; overload;
-begin
-  Result := Self.Hover(0, 0);
-end;
-
-function TReflectObject.Click(Button, RanX, RanY: Integer): Boolean; overload;
+function TReflectObject.Click(Button: Integer; RanX, RanY: Integer = 0): Boolean;
 begin
   if (not Self.IsOnMS) then
     Exit;
@@ -378,13 +373,8 @@ begin
   Result := True;
 end;
 
-function TReflectObject.Click(Button: Integer): Boolean; overload;
-begin
-  Result := Self.Click(0, 0, Button);
-end;
-
 {* Credit elfyyy (?), modified by flamingo1 *}
-function TReflectObject.ChooseOption(Option: String; Tries: Integer): Boolean;
+function TReflectObject.ChooseOption(Option: String; Tries: Integer = 3): Boolean;
 var
   N: Integer;
 begin
@@ -408,9 +398,4 @@ begin
 
     Wait(RandomRange(120, 180));
   end;
-end;
-
-function TReflectObject.ChooseOption(Option: String): Boolean; overload;
-begin
-  Result := Self.ChooseOption(Option, 1);
 end;
