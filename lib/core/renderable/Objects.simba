@@ -384,7 +384,7 @@ begin
 end;
 
 {* Credit elfyyy (?), modified by flamingo1 *}
-function TReflectObject.ChooseOption(Option: String; Tries: Integer): Boolean; overload;
+function TReflectObject.ChooseOption(Option: String; Tries: Integer): Boolean;
 var
   N: Integer;
 begin

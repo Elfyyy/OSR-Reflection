@@ -320,7 +320,7 @@ begin
 end;
 
 {* Credit elfyyy (?), modified by flamingo1 *}
-function TReflectGroundItem.ChooseOption(Option: String; Tries: Integer): Boolean; overload;
+function TReflectGroundItem.ChooseOption(Option: String; Tries: Integer): Boolean;
 var
   N: Integer;
 begin

@@ -265,7 +265,7 @@ begin
 end;
 
 {* Credit elfyyy (?), modified by flamingo1 *}
-function TReflectNPC.ChooseOption(Option: String; Tries: Integer): Boolean; overload;
+function TReflectNPC.ChooseOption(Option: String; Tries: Integer): Boolean;
 var
   N: Integer;
 begin
