@@ -209,3 +209,89 @@ begin
   Self._DefReference := HookCache[ckNpcDef][0];
   Self._Index := NpcIndex;
 end;
+
+{*Credit SRLTheMayor *}
+function TReflectNPC.IsOnMS: Boolean;
+begin
+  Result := PointInBox(Self.GetMSPoint, IntToBox(MSX1, MSY1, MSX2, MSY2));
+end;
+
+function TReflectNPC.RotateTo: Boolean;
+begin
+  Result := Reflect.Tiles.RotateCameraToTile(Self.GetTile);
+end;
+
+{* Credit SRLTheMayor, modified by flamingo1 *}
+function TReflectNPC.WalkTo: Boolean; overload;
+begin
+  Result := TReflectLocalPlayer.WalkToTileMM(Self.GetTile);
+end;
+
+function TReflectNPC.WalkTo(aFrom, aTo: Integer): Boolean; overload;
+begin
+  Result := TReflectLocalPlayer.WalkToTileMM(
+    TReflectionTiles.TileRandom(
+      Self.GetTile, aFrom, aTo
+    )
+  );
+end;
+
+{* Credit flamingo1 *}
+function TReflectNPC.Hover(RanX, RanY: Integer): Boolean; overload;
+begin
+  if (not Self.IsOnMS) then
+    Exit;
+
+  Reflect.Mouse.Move(Self.GetMSPoint, RanX, RanY);
+end;
+
+function TReflectNPC.Hover: Boolean; overload;
+begin
+  Result := Self.Hover(0, 0);
+end;
+
+function TReflectNPC.Click(Button, RanX, RanY: Integer): Boolean; overload;
+begin
+  if (not Self.IsOnMS) then
+    Exit;
+
+  Reflect.Mouse.Move(Self.GetMSPoint, RanX, RanY, Button);
+  Result := True;
+end;
+
+function TReflectNPC.Click(Button: Integer): Boolean; overload;
+begin
+  Result := Self.Click(0, 0, Button);
+end;
+
+{* Credit elfyyy (?), modified by flamingo1 *}
+function TReflectNPC.ChooseOption(Option: String; Tries: Integer): Boolean; overload;
+var
+  N: Integer;
+begin
+  for N := 1 to Tries do
+  begin
+    Self.Hover();
+
+    if Reflect.Text.IsUpText(Option, 50) then
+      Reflect.Mouse.Click(MOUSE_LEFT)
+    else
+    begin
+      Reflect.Mouse.Click(MOUSE_RIGHT);
+      Wait(RandomRange(400, 500));
+      if (Reflect.Text.ChooseOption(Option)) then
+      begin
+        Wait(RandomRange(120, 180));
+        Result := True;
+        Exit;
+      end;
+    end;
+
+    Wait(RandomRange(120, 180));
+  end;
+end;
+
+function TReflectNPC.ChooseOption(Option: String): Boolean; overload;
+begin
+  Result := Self.ChooseOption(Option, 1);
+end;
