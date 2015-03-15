@@ -264,17 +264,20 @@ begin
     Self.Hover();
 
     if Reflect.Text.IsUpText(Option, 50) then
-      Reflect.Mouse.Click(MOUSE_LEFT)
-    else
     begin
-      Reflect.Mouse.Click(MOUSE_RIGHT);
-      Wait(RandomRange(400, 500));
-      if (Reflect.Text.ChooseOption(Option)) then
-      begin
-        Wait(RandomRange(120, 180));
-        Result := True;
-        Exit;
-      end;
+      Reflect.Mouse.Click(MOUSE_LEFT);
+      Wait(RandomRange(120, 180));
+      Result := True;
+      Exit;
+    end;
+
+    Reflect.Mouse.Click(MOUSE_RIGHT);
+    Wait(RandomRange(400, 500));
+    if (Reflect.Text.ChooseOption(Option)) then
+    begin
+      Wait(RandomRange(120, 180));
+      Result := True;
+      Exit;
     end;
 
     Wait(RandomRange(120, 180));

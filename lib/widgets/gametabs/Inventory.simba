@@ -215,15 +215,19 @@ function TReflectInvItem.ChooseOption(Option: String): Boolean;
 begin
   if not InRange(Self._InvSlot, 1, 28) then
     Exit;
+    
   Self.Hover(5, 5);
 
   if Reflect.Text.IsUpText(Option, 50) then
-    Result := Self.Click(MOUSE_LEFT, 5, 5)
-  else
   begin
-    Self.Click(MOUSE_RIGHT, 5, 5);
-    Result := Reflect.Text.ChooseOption(Option);
+    Reflect.Mouse.Click(MOUSE_LEFT);
+    Wait(RandomRange(120, 180));
+    Result := True;
+    Exit;
   end;
+
+  Self.Click(MOUSE_RIGHT, 5, 5);
+  Result := Reflect.Text.ChooseOption(Option);
 end;
 
 function TReflectInvItem.Use: Boolean;
