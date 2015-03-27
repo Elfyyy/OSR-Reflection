@@ -193,6 +193,53 @@ begin
   Result := Self.GetPoint;
 end;
 
+function TReflectInvItem.Hover(RanX, RanY: Integer = 0): Boolean;
+begin
+  if not InRange(Self._InvSlot, 1, 28) then
+    Exit;
+
+  Reflect.Mouse.Move(Self.GetMSPoint, RanX, RanY);
+  Result := True;
+end;
+
+function TReflectInvItem.Click(Button: Integer; RanX, RanY: Integer = 0): Boolean;
+begin
+  if not InRange(Self._InvSlot, 1, 28) then
+    Exit;
+
+  Reflect.Mouse.Move(Self.GetMSPoint, RanX, RanY, Button);
+  Result := True;
+end;
+
+function TReflectInvItem.ChooseOption(Option: String): Boolean;
+begin
+  if not InRange(Self._InvSlot, 1, 28) then
+    Exit;
+    
+  Self.Hover(5, 5);
+
+  if Reflect.Text.IsUpText(Option, 50) then
+  begin
+    Reflect.Mouse.Click(MOUSE_LEFT);
+    Wait(RandomRange(120, 180));
+    Result := True;
+    Exit;
+  end;
+
+  Self.Click(MOUSE_RIGHT, 5, 5);
+  Result := Reflect.Text.ChooseOption(Option);
+end;
+
+function TReflectInvItem.Use: Boolean;
+begin
+  Result := Self.ChooseOption('Use ' + Self.GetName);
+end;
+
+function TReflectInvItem.Drop: Boolean;
+begin
+  Result := Self.ChooseOption('Drop ' + Self.GetName);
+end;
+
 function TReflectionInventory.Count: Integer;
 var
   I: Integer;
@@ -284,14 +331,6 @@ begin
   ItemCount := Length(Temp);
   for I := 0 to ItemCount do
     Self.Drop(Temp[I]._Id);
-end;
-
-function TReflectInvItem.Drop: Boolean;
-begin
-  Reflect.Mouse.Move(Self.GetPoint, 2, 2);
-  Wait(RandomRange(160, 250));
-  Reflect.Mouse.Click(Mouse_Right);
-  Result := Reflect.Text.ChooseOption('Drop');
 end;
 
 procedure TReflectInvItemArray.Drop;

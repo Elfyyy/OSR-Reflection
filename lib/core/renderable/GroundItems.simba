@@ -264,3 +264,82 @@ begin
     Self := Temp[0];
   end;
 end;
+
+{*Credit SRLTheMayor *}
+function TReflectGroundItem.IsOnMS: Boolean;
+begin
+  Result := PointInBox(Self.GetMSPoint, IntToBox(MSX1, MSY1, MSX2, MSY2));
+end;
+
+function TReflectGroundItem.RotateTo: Boolean;
+begin
+  Result := Reflect.Tiles.RotateCameraToTile(Self.GetTile);
+end;
+
+{* Credit SRLTheMayor, modified by flamingo1 *}
+function TReflectGroundItem.WalkTo: Boolean;
+begin
+  Result := TReflectLocalPlayer.WalkToTileMM(Self.GetTile);
+end;
+
+function TReflectGroundItem.WalkTo(aFrom, aTo: Integer): Boolean; overload;
+begin
+  Result := TReflectLocalPlayer.WalkToTileMM(
+    TReflectionTiles.TileRandom(
+      Self.GetTile, aFrom, aTo
+    )
+  );
+end;
+
+{* Credit flamingo1 *}
+function TReflectGroundItem.Hover(RanX, RanY: Integer = 0): Boolean;
+begin
+  if (not Self.IsOnMS) then
+    Exit;
+
+  Reflect.Mouse.Move(Self.GetMSPoint, RanX, RanY);
+end;
+
+function TReflectGroundItem.Click(Button: Integer; RanX, RanY: Integer = 0): Boolean;
+begin
+  if (not Self.IsOnMS) then
+    Exit;
+
+  Reflect.Mouse.Move(Self.GetMSPoint, RanX, RanY, Button);
+  Result := True;
+end;
+
+{* Credit elfyyy (?), modified by flamingo1 *}
+function TReflectGroundItem.ChooseOption(Option: String; Tries: Integer = 3): Boolean;
+var
+  N: Integer;
+begin
+  for N := 1 to Tries do
+  begin
+    Self.Hover();
+
+    if Reflect.Text.IsUpText(Option, 50) then
+    begin
+      Reflect.Mouse.Click(MOUSE_LEFT);
+      Wait(RandomRange(120, 180));
+      Result := True;
+      Exit;
+    end;
+    
+    Reflect.Mouse.Click(MOUSE_RIGHT);
+    Wait(RandomRange(400, 500));
+    if (Reflect.Text.ChooseOption(Option)) then
+    begin
+      Wait(RandomRange(120, 180));
+      Result := True;
+      Exit;
+    end;
+
+    Wait(RandomRange(120, 180));
+  end;
+end;
+
+function TReflectGroundItem.Take(Tries: Integer = 1): Boolean;
+begin
+  Result := Self.ChooseOption('Take ' + Self.GetName, Tries);
+end;
