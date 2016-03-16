@@ -31,7 +31,7 @@ begin
   SetLength(Self, Count);
 end;
 
-procedure TReflectWornEquipment.AtSlot(Slot: Integer);
+function TReflectWornEquipment.AtSlot(Slot: Integer) : TIntegerArray;
 var
   EquipmentWidget, EquipmentChild: TReflectWidget;
 begin
@@ -57,7 +57,8 @@ begin
   end;
     EquipmentChild.Free;
     EquipmentWidget.Free;
-end;
+    exit([id, Quantity, EquipSlot]);
+end; 
 
 function TReflectWornEquipment.GetName: string;
 var
